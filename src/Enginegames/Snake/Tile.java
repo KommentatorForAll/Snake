@@ -2,7 +2,7 @@ package Enginegames.Snake;
 
 import Enginegames.*;
 
-public class Tile extends WorldObj{
+public class Tile extends WorldObj {
 
     public Tile next;
 

@@ -2,6 +2,7 @@ package Enginegames;
 
 import javax.swing.*;
 import java.awt.*;
+import Enginegames.*;
 
 public class GameUI extends JFrame {
 

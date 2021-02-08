@@ -1,8 +1,6 @@
 package Enginegames.Snake;
 
-import Enginegames.Snake.Tile;
-
-public class Head extends Tile {
+public class Head extends Enginegames.Snake.Tile {
 
     public Head() {
         super(null);

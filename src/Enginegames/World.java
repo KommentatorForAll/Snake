@@ -3,7 +3,7 @@ package Enginegames;
 import javax.swing.*;
 import java.util.*;
 
-public class World implements Tickable {
+public abstract class World implements Tickable {
 
     public int pixelSize;
     public int width, height;
@@ -23,7 +23,7 @@ public class World implements Tickable {
         ui = new WorldUI(name, pixelSize*width, pixelSize*height);
         e = new Engine(2);
         e.addObject(this);
-        //e.start();
+        e.start();
     }
 
     public void setBackgroundOption(WorldUI.ImageOption io) {

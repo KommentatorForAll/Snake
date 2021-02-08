@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public abstract class WorldObj implements Tickable{
+public abstract class WorldObj implements Tickable {
 
     public int x, y;
     public Image img;

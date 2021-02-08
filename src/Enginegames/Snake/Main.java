@@ -1,8 +1,6 @@
 package Enginegames.Snake;
 
-import Enginegames.GameUI;
-import Enginegames.World;
-import com.sun.nio.sctp.SctpSocketOption;
+import Enginegames.*;
 
 public class Main {
 
@@ -15,7 +13,7 @@ public class Main {
 
     public Main(boolean isAdContaminated) {
         System.out.println("test");
-        world = new World();
+        world = new Snakeworld();
         System.out.println("test");
         window = new GameUI("Snake", world.ui, isAdContaminated);
 
