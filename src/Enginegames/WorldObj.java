@@ -12,6 +12,14 @@ public abstract class WorldObj implements Tickable {
     public Image img;
     public World world;
 
+    public WorldObj() {
+
+    }
+
+    public WorldObj(Image img) {
+        this.img = img;
+    }
+
     public void setX(int x) {
         this.x = x;
     }

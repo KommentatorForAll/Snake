@@ -13,17 +13,17 @@ public abstract class World implements Tickable {
 
 
     public World() {
-        this("");
+        this("", 10, 10, 16);
     }
-    public World(String name) {
-        pixelSize = 64;
-        width = 10;
-        height = 10;
+    public World(String name, int width, int height, int pixelSize) {
+        this.width = width;
+        this.height = height;
+        this.pixelSize = pixelSize;
         objects = new ArrayList<>();
         ui = new WorldUI(name, pixelSize*width, pixelSize*height);
-        e = new Engine(2);
+        e = new Engine(20);
         e.addObject(this);
-        e.start();
+        //e.start();
     }
 
     public void setBackgroundOption(WorldUI.ImageOption io) {
@@ -60,5 +60,9 @@ public abstract class World implements Tickable {
         objects.add(obj);
         obj.world = this;
         ui.addImage(obj, new int[] {x,y});
+    }
+
+    public void setTps(double tps) {
+        e.tps = tps;
     }
 }
