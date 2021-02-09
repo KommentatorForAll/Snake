@@ -13,7 +13,7 @@ public abstract class WorldObj implements Tickable {
     public World world;
 
     public WorldObj() {
-
+        img = Util.loadImageFromAssets("Invis");
     }
 
     public WorldObj(Image img) {
@@ -47,15 +47,10 @@ public abstract class WorldObj implements Tickable {
     }
 
     public void setImage(String name) throws IOException {
-
         img = ImageIO.read(new File(name));
-
     }
 
-
-
     public abstract void tick();
-
 
 
 }

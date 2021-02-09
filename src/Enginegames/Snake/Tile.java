@@ -4,15 +4,25 @@ import Enginegames.*;
 
 public class Tile extends WorldObj {
 
-    public Tile next;
+    public Head head;
+    public int age = 0;
+    public int dir;
 
-    public Tile(Tile next) {
+    public Tile(Head head, int dir) {
         super();
-        this.next = next;
+        this.head = head;
+        this.dir = dir;
+        setImage(Util.loadImageFromAssets("python"));
     }
 
     @Override
     public void tick() {
-
+        age++;
+        if (age >= head.size) {
+            world.removeObject(this);
+        }
+        if (age == head.size-1) {
+            setImage(Util.loadImageFromAssets("tail"));
+        }
     }
 }

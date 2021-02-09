@@ -40,7 +40,7 @@ public class Engine {
     }
 
     public void start() {
-        new EngineStarter(this).run();
+        new EngineStarter(this).start();
     }
 
     public void stop() {
@@ -49,6 +49,14 @@ public class Engine {
 
     public void addObject(Tickable obj) {
         tickables.add(obj);
+    }
+
+    public double getTps() {
+        return tps;
+    }
+
+    public double getMspt() {
+        return 1000/tps;
     }
 
     public static class TickEngine extends Thread {

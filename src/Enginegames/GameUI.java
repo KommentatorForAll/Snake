@@ -2,6 +2,9 @@ package Enginegames;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+
 import Enginegames.*;
 
 public class GameUI extends JFrame {
@@ -24,6 +27,7 @@ public class GameUI extends JFrame {
         super(name);
         System.out.println("here");
         setLayout(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         int x = worldUI.getWidth(), y = worldUI.getHeight();
         if (adContaminated) {
             x += 600;
@@ -31,9 +35,22 @@ public class GameUI extends JFrame {
         }
 
         setSize(x,y);
+        setMinimumSize(worldUI.getSize());
         setLocation(0,0);
-        add(worldUI, BorderLayout.CENTER);
+        worldUI.setLocation(x/2-worldUI.getWidth()/2, y/2-worldUI.getHeight()/2);
+        add(worldUI);//, BorderLayout.CENTER);
         this.adContaminated = adContaminated;
         setVisible(true);
+
+        addComponentListener(new ComponentAdapter()
+        {
+            public void componentResized(ComponentEvent evt) {
+                Component c = (Component)evt.getSource();
+                int x = getWidth(), y = getHeight();
+                worldUI.setLocation(x/2-worldUI.getWidth()/2, y/2-worldUI.getHeight()/2);
+            }
+        });
     }
+
+
 }
