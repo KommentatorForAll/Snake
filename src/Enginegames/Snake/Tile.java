@@ -8,10 +8,16 @@ public class Tile extends WorldObj {
     public int age = 0;
     public int dir;
 
+
     public Tile(Head head, int dir) {
+        this(head, dir, 0);
+    }
+
+    public Tile(Head head, int dir, int age) {
         super();
         this.head = head;
         this.dir = dir;
+        this.age = age;
         setImage(Util.loadImageFromAssets("python"));
     }
 

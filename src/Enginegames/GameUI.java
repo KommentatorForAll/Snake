@@ -36,7 +36,7 @@ public class GameUI extends JFrame {
 
         setSize(x,y);
         setMinimumSize(worldUI.getSize());
-        setLocation(0,0);
+        setLocation(2200,100);
         worldUI.setLocation(x/2-worldUI.getWidth()/2, y/2-worldUI.getHeight()/2);
         add(worldUI);//, BorderLayout.CENTER);
         this.adContaminated = adContaminated;

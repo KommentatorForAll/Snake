@@ -9,6 +9,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +18,7 @@ public class WorldUI extends JPanel {
     public BufferedImage backgroundImage;
     public ImageOption bgOption = ImageOption.NONE;
 
-    public Map<WorldObj, int[]> objs;
+    public HashMap<WorldObj, int[]> objs;
     public int pxsize;
 
     public WorldUI(String name, int width, int height) {
@@ -72,6 +73,14 @@ public class WorldUI extends JPanel {
 
     public void addImage(WorldObj obj, int[] pos) {
         objs.put(obj, pos);
+    }
+
+    public void removeImage(WorldObj obj) {
+        objs.remove(obj);
+    }
+
+    public void removeImages(Collection<WorldObj> objects) {
+        objects.forEach(objs::remove);
     }
 
     public enum ImageOption {

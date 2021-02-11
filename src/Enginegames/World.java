@@ -29,7 +29,7 @@ public abstract class World implements Tickable, KeyListener {
         ui = new WorldUI(name, pixelSize*width, pixelSize*height, WorldUI.ImageOption.NONE, pixelSize, this);
         e = new Engine(20);
         e.addObject(this);
-        //e.start();
+        start();
     }
 
     public void setBackgroundOption(WorldUI.ImageOption io) {
@@ -59,6 +59,7 @@ public abstract class World implements Tickable, KeyListener {
         toRemove = new ArrayList<>();
         objects.forEach(WorldObj::tick);
         objects.removeAll(toRemove);
+        ui.removeImages(toRemove);
         ui.repaint();
     }
 
