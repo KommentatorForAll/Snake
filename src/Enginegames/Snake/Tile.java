@@ -22,7 +22,7 @@ public class Tile extends WorldObj {
     }
 
     @Override
-    public void tick() {
+    public void loop() {
         age++;
         if (age >= head.size) {
             world.removeObject(this);

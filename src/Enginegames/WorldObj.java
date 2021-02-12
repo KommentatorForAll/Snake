@@ -50,7 +50,10 @@ public abstract class WorldObj implements Tickable {
         img = ImageIO.read(new File(name));
     }
 
-    public abstract void tick();
+    public void tick() {
+        loop();
+    }
 
+    public abstract void loop();
 
 }

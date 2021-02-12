@@ -15,7 +15,7 @@ public class Main {
         System.out.println("test");
         world = new Snakeworld();
         System.out.println("test");
-        window = new GameUI("Snake", world.ui, isAdContaminated);
+        window = new GameUI("Snake", world.ui, isAdContaminated, world);
 
         window.setVisible(true);
 

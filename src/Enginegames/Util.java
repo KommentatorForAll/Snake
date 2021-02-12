@@ -11,7 +11,6 @@ public class Util {
         if (!filelocation.matches("\\..+$")) {
             filelocation += ".png";
         }
-        System.out.println(filelocation);
         try {
             return ImageIO.read(new File(filelocation));
         } catch (IOException e) {

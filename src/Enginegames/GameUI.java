@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyListener;
 
 import Enginegames.*;
 
@@ -16,14 +17,14 @@ public class GameUI extends JFrame {
     }
 
     public GameUI(String name, JPanel worldUI) {
-        this(name, worldUI, true);
+        this(name, worldUI, true, null);
     }
 
     public GameUI(String name, World world, boolean adContaminated) {
-        this(name, world.ui, adContaminated);
+        this(name, world.ui, adContaminated, null);
     }
 
-    public GameUI(String name, JPanel worldUI, boolean adContaminated) {
+    public GameUI(String name, JPanel worldUI, boolean adContaminated, KeyListener kl) {
         super(name);
         System.out.println("here");
         setLayout(null);
@@ -33,6 +34,7 @@ public class GameUI extends JFrame {
             x += 600;
             y += 200;
         }
+        addKeyListener(kl);
 
         setSize(x,y);
         setMinimumSize(worldUI.getSize());

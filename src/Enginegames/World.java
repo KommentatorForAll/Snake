@@ -13,9 +13,10 @@ public abstract class World implements Tickable, KeyListener {
 
     public int pixelSize;
     public int width, height;
-    public ArrayList<WorldObj> objects, toRemove;
+    public ArrayList<WorldObj> objects, toRemove = new ArrayList<>(), toAdd = new ArrayList<>();
     public Engine e;
     public WorldUI ui;
+    public boolean enableDebug = false;
 
 
     public World() {
@@ -55,18 +56,23 @@ public abstract class World implements Tickable, KeyListener {
 
 
     public void tick() {
+        if (enableDebug)
         System.out.println("tick at "+System.currentTimeMillis());
-        toRemove = new ArrayList<>();
-        objects.forEach(WorldObj::tick);
         objects.removeAll(toRemove);
-        ui.removeImages(toRemove);
-        ui.repaint();
+        objects.addAll(toAdd);
+        toRemove = new ArrayList<>();
+        toAdd = new ArrayList<>();
+        loop();
+        objects.forEach(WorldObj::tick);
+        ui.paint(objects);
     }
 
+    public abstract void loop();
+
     public void addObject(WorldObj obj, int x, int y) {
-        objects.add(obj);
+        toAdd.add(obj);
+        System.out.println(toAdd.size());
         obj.world = this;
-        ui.addImage(obj, new int[] {x,y});
     }
 
     public void removeObject(WorldObj obj) {

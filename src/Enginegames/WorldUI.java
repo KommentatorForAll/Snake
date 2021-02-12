@@ -42,7 +42,14 @@ public class WorldUI extends JPanel {
         repaint();
     }
 
+    public void paint(ArrayList<WorldObj> objects) {
+        objs = new HashMap<>();
+        objects.forEach((o) -> objs.put(o, new int[] {o.x,o.y}));
+        repaint();
+    }
+
     public void paintComponent(Graphics g) {
+        System.out.println(objs.size());
         if (backgroundImage != null)
             switch(bgOption) {
                 case TILED:
