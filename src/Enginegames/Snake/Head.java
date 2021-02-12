@@ -10,7 +10,7 @@ public class Head extends Enginegames.Snake.Tile {
 
     public Head(World world, int x, int y) {
         super(null, 0);
-        size = 3;
+        size = 2;
         world.addObject(this, x, y);
         setImage(Util.loadImageFromAssets("head"));
         Tile mid = new Tile(this, 0,1), tail = new Tile(this,0, 2);
@@ -18,7 +18,7 @@ public class Head extends Enginegames.Snake.Tile {
         world.addObject(tail, x, y-2);
     }
 
-    public void loop() {
+    public void tick() {
         changedDir = false;
         int dx = 0, dy = 0;
         switch (dir) {
@@ -40,21 +40,23 @@ public class Head extends Enginegames.Snake.Tile {
     }
 
     public void keyPressed(int key) {
+        if (!changedDir)
         switch (key) {
-            case 'w':
+            case (int)'w':
+                System.out.println("here");
                 if (dir != 2 && dir != 0) {
                     dir = 0;
                     changedDir = true;
                 }
                 break;
-            case 'a':
+            case (int)'a':
                 if (dir != 1 && dir != 3) {
                     dir = 1;
                     changedDir = true;
                 }
                 break;
 
-            case 's':
+            case (int)'s':
                 if (dir != 2 && dir != 0) {
                     dir = 2;
                     changedDir = true;
@@ -62,7 +64,7 @@ public class Head extends Enginegames.Snake.Tile {
                 changedDir = true;
                 break;
 
-            case 'd':
+            case (int)'d':
                 if (dir != 1 && dir != 3) {
                     dir = 3;
                     changedDir = true;

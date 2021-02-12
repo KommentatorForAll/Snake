@@ -2,30 +2,26 @@ package Enginegames;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
 
 public class WorldUI extends JPanel {
 
     public BufferedImage backgroundImage;
-    public ImageOption bgOption = ImageOption.NONE;
+    public ImageOption bgOption;
 
     public HashMap<WorldObj, int[]> objs;
     public int pxsize;
 
-    public WorldUI(String name, int width, int height) {
-        this(name, width, height, ImageOption.NONE,1, null);
+    public WorldUI(int width, int height) {
+        this(width, height, ImageOption.NONE,1, null);
     }
 
-    public WorldUI(String name, int width, int height, ImageOption bgOption, int pxsize, KeyListener kl) {
+    public WorldUI(int width, int height, ImageOption bgOption, int pxsize, KeyListener kl) {
         super();
         objs = new HashMap<>();
         this.bgOption = bgOption;
@@ -49,7 +45,6 @@ public class WorldUI extends JPanel {
     }
 
     public void paintComponent(Graphics g) {
-        System.out.println(objs.size());
         if (backgroundImage != null)
             switch(bgOption) {
                 case TILED:
@@ -75,19 +70,6 @@ public class WorldUI extends JPanel {
                     break;
             }
         objs.forEach((obj, pos) -> g.drawImage(obj.img, pos[0]*pxsize, pos[1]*pxsize, null));
-    }
-
-
-    public void addImage(WorldObj obj, int[] pos) {
-        objs.put(obj, pos);
-    }
-
-    public void removeImage(WorldObj obj) {
-        objs.remove(obj);
-    }
-
-    public void removeImages(Collection<WorldObj> objects) {
-        objects.forEach(objs::remove);
     }
 
     public enum ImageOption {

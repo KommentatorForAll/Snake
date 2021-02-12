@@ -5,7 +5,7 @@ import Enginegames.*;
 public class Tile extends WorldObj {
 
     public Head head;
-    public int age = 0;
+    public int age;
     public int dir;
 
 
@@ -22,7 +22,7 @@ public class Tile extends WorldObj {
     }
 
     @Override
-    public void loop() {
+    public void tick() {
         age++;
         if (age >= head.size) {
             world.removeObject(this);

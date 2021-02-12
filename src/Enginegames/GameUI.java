@@ -1,12 +1,9 @@
 package Enginegames;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyListener;
-
-import Enginegames.*;
 
 public class GameUI extends JFrame {
 
@@ -26,7 +23,6 @@ public class GameUI extends JFrame {
 
     public GameUI(String name, JPanel worldUI, boolean adContaminated, KeyListener kl) {
         super(name);
-        System.out.println("here");
         setLayout(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         int x = worldUI.getWidth(), y = worldUI.getHeight();
@@ -47,7 +43,6 @@ public class GameUI extends JFrame {
         addComponentListener(new ComponentAdapter()
         {
             public void componentResized(ComponentEvent evt) {
-                Component c = (Component)evt.getSource();
                 int x = getWidth(), y = getHeight();
                 worldUI.setLocation(x/2-worldUI.getWidth()/2, y/2-worldUI.getHeight()/2);
             }

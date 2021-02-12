@@ -1,8 +1,10 @@
-package Enginegames.Snake;
+package Enginegames;
 
-import Enginegames.*;
+import Enginegames.Snake.Snakeworld;
 
 public class Main {
+
+    public static boolean enableDebug = false;
 
     World world;
     GameUI window;
@@ -12,12 +14,13 @@ public class Main {
     }
 
     public Main(boolean isAdContaminated) {
-        System.out.println("test");
         world = new Snakeworld();
-        System.out.println("test");
         window = new GameUI("Snake", world.ui, isAdContaminated, world);
-
+        window.setIconImage(Util.loadImageFromAssets("title"));
         window.setVisible(true);
+    }
 
+    public static void main(String[] args) {
+        new Main();
     }
 }

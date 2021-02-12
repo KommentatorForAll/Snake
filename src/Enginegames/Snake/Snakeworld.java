@@ -9,13 +9,14 @@ public class Snakeworld extends World {
     public Head head;
 
     public Snakeworld() {
-        super("Snake", 10, 10, 64);
+        super(10, 10, 64);
+        Enginegames.Main.enableDebug = true;
         setTps(2);
         setBackground(Util.loadImageFromAssets("background_tile"));
         setBackgroundOption(WorldUI.ImageOption.TILED);
     }
 
-    public void loop() {
+    public void tick() {
         t++;
         if (started && !running) {
             started = true;
@@ -30,7 +31,7 @@ public class Snakeworld extends World {
 
     public void resume() {
         running = true;
-        start();
+        if (!e.started) start();
     }
 
     public void pause() {
@@ -39,7 +40,7 @@ public class Snakeworld extends World {
     }
 
     public void keyPressed(int key) {
-        System.out.println(key);
+        System.out.println("Key pressed: "+key);
         if (key == ' ') {
             if (head == null) begin();
             else resume();

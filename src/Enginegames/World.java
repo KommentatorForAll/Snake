@@ -1,117 +1,135 @@
 package Enginegames;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public abstract class World implements Tickable, KeyListener {
 
     public int pixelSize;
     public int width, height;
     public ArrayList<WorldObj> objects, toRemove = new ArrayList<>(), toAdd = new ArrayList<>();
+    public Queue<KeyEventInfo> keys = new ConcurrentLinkedQueue<>();
     public Engine e;
     public WorldUI ui;
     public boolean enableDebug = false;
 
 
     public World() {
-        this("", 10, 10, 16);
+        this(10, 10, 16);
     }
-    public World(String name, int width, int height, int pixelSize) {
+    public World(int width, int height, int pixelSize) {
         this.width = width;
         this.height = height;
         this.pixelSize = pixelSize;
         objects = new ArrayList<>();
-        ui = new WorldUI(name, pixelSize*width, pixelSize*height, WorldUI.ImageOption.NONE, pixelSize, this);
+        ui = new WorldUI(pixelSize*width, pixelSize*height, WorldUI.ImageOption.NONE, pixelSize, this);
         e = new Engine(20);
         e.addObject(this);
         start();
     }
 
-    public void setBackgroundOption(WorldUI.ImageOption io) {
+    public final void setBackgroundOption(WorldUI.ImageOption io) {
         ui.bgOption = io;
     }
 
 
-    public void resizeField(int width, int height) {
+    public final void resizeField(int width, int height) {
         this.width = width;
         this.height = height;
         updateSize();
     }
 
-    public void resizeField(int pixelSize) {
+    public final void resizeField(int pixelSize) {
         this.pixelSize = pixelSize;
         updateSize();
     }
 
-    public void updateSize() {
+    public final void updateSize() {
         ui.setSize(width*pixelSize, height*pixelSize);
         ui.repaint();
     }
 
 
-    public void tick() {
-        if (enableDebug)
-        System.out.println("tick at "+System.currentTimeMillis());
+    public final void _tick() {
+        toRemove.clear();
+        toAdd.clear();
+        tick();
+        handleKeys();
+        objects.forEach(WorldObj::_tick);
         objects.removeAll(toRemove);
         objects.addAll(toAdd);
-        toRemove = new ArrayList<>();
-        toAdd = new ArrayList<>();
-        loop();
-        objects.forEach(WorldObj::tick);
         ui.paint(objects);
     }
 
-    public abstract void loop();
+    public abstract void tick();
 
-    public void addObject(WorldObj obj, int x, int y) {
+    public final void addObject(WorldObj obj, int x, int y) {
         toAdd.add(obj);
-        System.out.println(toAdd.size());
+        obj.setLocation(x,y);
         obj.world = this;
     }
 
-    public void removeObject(WorldObj obj) {
+    public final void removeObject(WorldObj obj) {
         toRemove.add(obj);
+        obj.world = null;
     }
 
-    public void setTps(double tps) {
+    public final void setTps(double tps) {
         e.tps = tps;
     }
 
-    public void start() {
-        e.start();
+    public final void start() {
+        if (!e.started) e.start();
     }
 
-    public void stop() {
-        e.stop();
+    public final void stop() {
+        if (e.started) e.stop();
     }
 
-    public void setBackground(BufferedImage img) {
+    public final void setBackground(BufferedImage img) {
         ui.setBackground(img);
     }
 
+
     @Override
-    public void keyTyped(KeyEvent e) {
-        keyTyped(e.getKeyChar());
-        keyTyped(e.getKeyCode());
+    public final void keyTyped(KeyEvent e) {
+        keys.add(new KeyEventInfo(e, 0));
     }
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        keyPressed(e.getKeyChar());
-        keyPressed(e.getKeyCode());
+    public final void keyPressed(KeyEvent e) {
+        keys.add(new KeyEventInfo(e, 1));
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-        keyReleased(e.getKeyChar());
-        keyReleased(e.getKeyCode());
+    public final void keyReleased(KeyEvent e) {
+        keys.add(new KeyEventInfo(e, 2));
     }
+
+    public final void handleKeys() {
+        KeyEventInfo e;
+        while ((e = keys.poll()) != null)
+        {
+            switch (e.type) {
+                case 0:
+                    keyTyped(e.e.getKeyChar());
+                    keyTyped((int)e.e.getKeyChar());
+                    break;
+                case 1:
+                    keyPressed(e.e.getKeyChar());
+                    keyPressed((int)e.e.getKeyChar());
+                    break;
+                case 2:
+                    keyReleased(e.e.getKeyChar());
+                    keyReleased((int)e.e.getKeyChar());
+                    break;
+            }
+        }
+    }
+
 
     public void keyTyped(char key){}
 
@@ -124,4 +142,13 @@ public abstract class World implements Tickable, KeyListener {
     public void keyPressed(int key){}
 
     public void keyReleased(int key){}
+
+    private static class KeyEventInfo {
+        public int type;
+        public KeyEvent e;
+        public KeyEventInfo(KeyEvent e, int type) {
+            this.e = e;
+            this.type = type;
+        }
+    }
 }

@@ -2,7 +2,6 @@ package Enginegames;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -50,10 +49,10 @@ public abstract class WorldObj implements Tickable {
         img = ImageIO.read(new File(name));
     }
 
-    public void tick() {
-        loop();
+    public final void _tick() {
+        tick();
     }
 
-    public abstract void loop();
+    public abstract void tick();
 
 }
