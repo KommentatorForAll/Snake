@@ -19,33 +19,33 @@ public abstract class WorldObj implements Tickable {
         this.img = img;
     }
 
-    public void setX(int x) {
-        this.x = x;
+    public final void setX(int x) {
+        this.x = world!=null?world.hardEdge?Math.max(0,Math.min(x,world.width)):x:x;
     }
 
-    public void setY(int y) {
-        this.y = y;
+    public final void setY(int y) {
+        this.y = world!=null?world.hardEdge?Math.max(0,Math.min(y,world.width)):y:y;
     }
 
-    public void setLocation(int x, int y) {
+    public final void setLocation(int x, int y) {
         setX(x);
         setY(y);
     }
 
-    public void move(int[] dir) throws IndexOutOfBoundsException{
+    public final void move(int[] dir) throws IndexOutOfBoundsException{
         move(dir[0], dir[1]);
     }
 
-    public void move(int x, int y) {
-        this.x += x;
-        this.y += y;
+    public final void move(int x, int y) {
+        setX(this.x + x);
+        setY(this.y + y);
     }
 
-    public void setImage(Image img) {
+    public final void setImage(Image img) {
         this.img = img;
     }
 
-    public void setImage(String name) throws IOException {
+    public final void setImage(String name) throws IOException {
         img = ImageIO.read(new File(name));
     }
 
@@ -55,4 +55,13 @@ public abstract class WorldObj implements Tickable {
 
     public abstract void tick();
 
+    public final boolean isAtEdge() {
+        return x == 0 || x == world.width-1 || y == 0 || y == world.height-1;
+    }
+
+    public final boolean oob() {return isOutOfBounds();}
+
+    public final boolean isOutOfBounds() {
+        return x < 0 || x >= world.width || y < 0 || y >= world.height;
+    }
 }

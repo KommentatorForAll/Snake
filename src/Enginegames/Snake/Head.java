@@ -16,9 +16,13 @@ public class Head extends Enginegames.Snake.Tile {
         Tile mid = new Tile(this, 0,1), tail = new Tile(this,0, 2);
         world.addObject(mid, x, y-1);
         world.addObject(tail, x, y-2);
+        Apple.generate(world);
+        dir = 2;
     }
 
     public void tick() {
+        checkDeath();
+        appleHandling();
         changedDir = false;
         int dx = 0, dy = 0;
         switch (dir) {
@@ -37,6 +41,20 @@ public class Head extends Enginegames.Snake.Tile {
         }
         world.addObject(new Tile(this, 0), this.x, this.y);
         move(dx,dy);
+    }
+
+    private void checkDeath() {
+        if (oob() || world.objectsAt(x,y, Tile.class).size() >1) {
+            ((Snakeworld) world).showDeathscreen();
+        }
+    }
+
+    public void appleHandling() {
+        if (world.isObjectAt(x,y, Apple.class)) {
+            size++;
+            world.removeObject(world.objectsOf(Apple.class).get(0));
+            Apple.generate(world);
+        }
     }
 
     public void keyPressed(int key) {

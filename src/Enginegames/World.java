@@ -5,6 +5,7 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 public abstract class World implements Tickable, KeyListener {
 
@@ -13,7 +14,9 @@ public abstract class World implements Tickable, KeyListener {
     public ArrayList<WorldObj> objects, toRemove = new ArrayList<>(), toAdd = new ArrayList<>();
     public Queue<KeyEventInfo> keys = new ConcurrentLinkedQueue<>();
     public Engine e;
+    public boolean hardEdge;
     public WorldUI ui;
+    public Random random;
     public boolean enableDebug = false;
 
 
@@ -24,6 +27,7 @@ public abstract class World implements Tickable, KeyListener {
         this.width = width;
         this.height = height;
         this.pixelSize = pixelSize;
+        random = new Random();
         objects = new ArrayList<>();
         ui = new WorldUI(pixelSize*width, pixelSize*height, WorldUI.ImageOption.NONE, pixelSize, this);
         e = new Engine(20);
@@ -91,6 +95,24 @@ public abstract class World implements Tickable, KeyListener {
 
     public final void setBackground(BufferedImage img) {
         ui.setBackground(img);
+    }
+
+    public final boolean isObjectAt(int x, int y) {
+        System.out.println("searching at "+x+","+y);
+        objects.forEach(o-> System.out.println(o+"; at x"+o.x+", y"+o.y));
+        return objects.stream().anyMatch((o) -> o.x == x && o.y == y);
+    }
+
+    public final <T extends WorldObj> boolean isObjectAt(int x, int y, Class<T> cls) {
+        return objectsOf(cls).stream().anyMatch(o -> o.x == x && o.y ==y);
+    }
+
+    public final <T extends WorldObj> List<T> objectsOf(Class<T> cls) {
+        return objects.stream().filter(cls::isInstance).map(o -> (T) o).collect(Collectors.toList());
+    }
+
+    public final <T extends WorldObj> List<T> objectsAt(int x, int y, Class<T> cls) {
+        return objectsOf(cls).stream().filter(o -> o.x == x && o.y == y).collect(Collectors.toList());
     }
 
 

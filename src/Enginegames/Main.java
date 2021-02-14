@@ -10,7 +10,7 @@ public class Main {
     GameUI window;
 
     public Main() {
-        this(true);
+        this(false);
     }
 
     public Main(boolean isAdContaminated) {
