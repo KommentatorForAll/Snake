@@ -64,4 +64,16 @@ public abstract class WorldObj implements Tickable {
     public final boolean isOutOfBounds() {
         return x < 0 || x >= world.width || y < 0 || y >= world.height;
     }
+
+    public String toString() {
+        String s = super.toString();
+        s += "; in world: ";
+        if (world == null) {
+            s+="none";
+        }
+        else {
+            s+= world + "; at position x=" + x + ", y=" + y;
+        }
+        return s;
+    }
 }

@@ -98,8 +98,10 @@ public abstract class World implements Tickable, KeyListener {
     }
 
     public final boolean isObjectAt(int x, int y) {
-        System.out.println("searching at "+x+","+y);
-        objects.forEach(o-> System.out.println(o+"; at x"+o.x+", y"+o.y));
+        if (Main.enableDebug) {
+            System.out.println("searching at "+x+","+y);
+            objects.forEach(System.out::println);
+        }
         return objects.stream().anyMatch((o) -> o.x == x && o.y == y);
     }
 
@@ -172,5 +174,9 @@ public abstract class World implements Tickable, KeyListener {
             this.e = e;
             this.type = type;
         }
+    }
+
+    public String toString() {
+        return this.getClass().getSimpleName();
     }
 }

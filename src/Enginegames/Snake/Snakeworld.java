@@ -9,10 +9,10 @@ public class Snakeworld extends World {
     public Head head;
 
     public Snakeworld() {
-        super(20, 15, 64);
+        super(10, 10, 64);
         Enginegames.Main.enableDebug = true;
         setTps(4);
-        setBackground(Util.loadImageFromAssets("background_tile"));
+        setBackground(Util.loadImageFromAssets("bg_grass"));
         setBackgroundOption(WorldUI.ImageOption.TILED);
     }
 
