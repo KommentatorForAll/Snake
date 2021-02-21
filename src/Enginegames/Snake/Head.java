@@ -1,23 +1,31 @@
 package Enginegames.Snake;
 
-import Enginegames.Util;
+import Enginegames.AdvancedImage;
+import Enginegames.Utils;
 import Enginegames.World;
+
+import java.awt.image.BufferedImage;
 
 public class Head extends Enginegames.Snake.Tile {
 
-    public int size;
+    public int size, lastdir;
     public boolean changedDir = false;
+    AdvancedImage commonImage = AdvancedImage.rotateImageByDegrees(Utils.loadImageFromAssets("head"), 90);
+
 
     public Head(World world, int x, int y) {
         super(null, 0);
+        commonImage.imgpos = AdvancedImage.ImagePosition.TOP_LEFT;
+        commonImage.imgs = AdvancedImage.ImageSizing.TILE;
         size = 2;
         world.addObject(this, x, y);
-        setImage(Util.loadImageFromAssets("head"));
+        setImage(commonImage);
         Tile mid = new Tile(this, 0,1), tail = new Tile(this,0, 2);
         world.addObject(mid, x, y-1);
         world.addObject(tail, x, y-2);
         Apple.generate(world);
         dir = 2;
+        lastdir = dir;
     }
 
     public void tick() {
@@ -39,8 +47,9 @@ public class Head extends Enginegames.Snake.Tile {
                 dx = 1;
                 break;
         }
-        world.addObject(new Tile(this, 0), this.x, this.y);
+        world.addObject(new Tile(this, lastdir*4+dir), this.x, this.y);
         move(dx,dy);
+        lastdir = dir;
     }
 
     private void checkDeath() {
@@ -90,5 +99,6 @@ public class Head extends Enginegames.Snake.Tile {
                 changedDir = true;
                 break;
         }
+        setImage(AdvancedImage.rotateImageByDegrees(commonImage, dir * 90));
     }
 }

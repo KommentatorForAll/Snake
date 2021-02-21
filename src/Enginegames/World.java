@@ -13,7 +13,7 @@ public abstract class World implements Tickable, KeyListener {
     public int width, height;
     public ArrayList<WorldObj> objects, toRemove = new ArrayList<>(), toAdd = new ArrayList<>();
     public Queue<KeyEventInfo> keys = new ConcurrentLinkedQueue<>();
-    public Engine e;
+    public static Engine e = new Engine(20);
     public boolean hardEdge;
     public WorldUI ui;
     public Random random;
@@ -30,8 +30,6 @@ public abstract class World implements Tickable, KeyListener {
         random = new Random();
         objects = new ArrayList<>();
         ui = new WorldUI(pixelSize*width, pixelSize*height, WorldUI.ImageOption.NONE, pixelSize, this);
-        e = new Engine(20);
-        e.addObject(this);
         start();
     }
 
@@ -81,19 +79,34 @@ public abstract class World implements Tickable, KeyListener {
         obj.world = null;
     }
 
+    public final <T extends WorldObj> void removeObjects(Collection<T> objs) {
+        objects.removeAll(objs);
+        objs.forEach(o -> o.world = null);
+    }
+
+    public final void removeAll() {
+        objects.forEach(o -> o.world = null);
+        objects.clear();
+    }
+
     public final void setTps(double tps) {
         e.tps = tps;
     }
 
     public final void start() {
-        if (!e.started) e.start();
+        e.addObject(this);
     }
 
     public final void stop() {
-        if (e.started) e.stop();
+        e.removeObject(this);
     }
 
-    public final void setBackground(BufferedImage img) {
+    public static void switchWorld(World world) {
+        e.removeObjects(World.class);
+        e.addObject(world);
+    }
+
+    public final void setBackground(AdvancedImage img) {
         ui.setBackground(img);
     }
 

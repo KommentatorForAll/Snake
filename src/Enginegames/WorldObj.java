@@ -8,14 +8,14 @@ import java.io.IOException;
 public abstract class WorldObj implements Tickable {
 
     public int x, y;
-    public Image img;
+    public AdvancedImage img;
     public World world;
 
     public WorldObj() {
-        img = Util.loadImageFromAssets("Invis");
+        img = Utils.loadImageFromAssets("Invis");
     }
 
-    public WorldObj(Image img) {
+    public WorldObj(AdvancedImage img) {
         this.img = img;
     }
 
@@ -41,12 +41,12 @@ public abstract class WorldObj implements Tickable {
         setY(this.y + y);
     }
 
-    public final void setImage(Image img) {
+    public final void setImage(AdvancedImage img) {
         this.img = img;
     }
 
     public final void setImage(String name) throws IOException {
-        img = ImageIO.read(new File(name));
+        img = new AdvancedImage(ImageIO.read(new File(name)));
     }
 
     public final void _tick() {

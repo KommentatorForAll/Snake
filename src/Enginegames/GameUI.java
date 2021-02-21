@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyListener;
+import java.util.Arrays;
 
 public class GameUI extends JFrame {
 
@@ -34,21 +35,24 @@ public class GameUI extends JFrame {
             y += 200;
         }
         addKeyListener(kl);
+        setVisible(true);
 
-        setSize(x,y);
-        setMinimumSize(worldUI.getSize());
+        int[] bardim = getBorderDims();
+        System.out.println(Arrays.toString(bardim));
+        Dimension d = new Dimension(x+bardim[0], y+bardim[1]);
+        setSize(d);
+        setMinimumSize(d);
         int[] mpos = getLastMonitorPosition();
         setLocation(mpos[0],mpos[1]);
-        worldUI.setLocation(x/2-worldUI.getWidth()/2, y/2-worldUI.getHeight()/2);
+        worldUI.setLocation(x/2-worldUI.getWidth()/2-bardim[0], y/2-worldUI.getHeight()/2-bardim[1]);
         add(worldUI);//, BorderLayout.CENTER);
         this.adContaminated = adContaminated;
-        setVisible(true);
 
         addComponentListener(new ComponentAdapter()
         {
             public void componentResized(ComponentEvent evt) {
                 int x = getWidth(), y = getHeight();
-                worldUI.setLocation(x/2-worldUI.getWidth()/2, y/2-worldUI.getHeight()/2);
+                worldUI.setLocation(x/2-worldUI.getWidth()/2-(bardim[0]/2), y/2-worldUI.getHeight()/2-(bardim[1]/2));
             }
         });
     }
@@ -71,5 +75,14 @@ public class GameUI extends JFrame {
             x += monitors[i].getDisplayMode().getWidth();
         }
         return new int[] {x,y};
+    }
+
+    public int[] getBorderDims() {
+        Dimension size = getSize();
+        Insets insets = getInsets();
+        if (insets != null) {
+            return new int[] {insets.left+insets.right, insets.top+insets.bottom};
+        }
+        return new int[] {0, 0};
     }
 }

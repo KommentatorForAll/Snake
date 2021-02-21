@@ -1,13 +1,14 @@
 package Enginegames;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Engine {
 
-    public long ttime;
+    public long ttime, tick;
     public double tps;
     public boolean started;
-    public ArrayList<Tickable> tickables;
+    public List<Tickable> tickables;
 
     /**
      * Creates a new Enginegames.Engine to help with ticking
@@ -17,13 +18,15 @@ public class Engine {
         tickables = new ArrayList<>();
         this.tps = tps;
         ttime = System.currentTimeMillis();
+        start();
     }
 
     public void loop() {
         long cur;
+        tick = 0;
         while (started) {
             try {
-                TickEngine t = new TickEngine(this);
+                TickEngine t = new TickEngine(this, tick++);
                 t.start();
                 if (Main.enableDebug) {
                     cur = System.currentTimeMillis();
@@ -59,6 +62,22 @@ public class Engine {
         tickables.add(obj);
     }
 
+    public <T extends Tickable> void addObjects(Collection<T> objs) {
+        tickables.addAll(objs);
+    }
+
+    public void removeObject(Tickable obj) {
+        tickables.remove(obj);
+    }
+
+    public <T extends Tickable> void removeObjects(Collection<T> objs) {
+        tickables.removeAll(objs);
+    }
+
+    public <T extends Tickable> void removeObjects(Class<T> cls) {
+        tickables = tickables.stream().filter(t -> !cls.isInstance(t)).collect(Collectors.toList());
+    }
+
     public double getTps() {
         return tps;
     }
@@ -67,10 +86,13 @@ public class Engine {
         return 1000/tps;
     }
 
+
+
     public static class TickEngine extends Thread {
         Engine e;
 
-        public TickEngine(Engine e) {
+        public TickEngine(Engine e, long cnt) {
+            super("Tick-"+cnt);
             this.e = e;
         }
 

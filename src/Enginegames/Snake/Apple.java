@@ -1,13 +1,13 @@
 package Enginegames.Snake;
 
-import Enginegames.Util;
+import Enginegames.Utils;
 import Enginegames.World;
 import Enginegames.WorldObj;
 
 public class Apple extends WorldObj {
 
     public Apple() {
-        setImage(Util.loadImageFromAssets("apple"));
+        setImage(Utils.loadImageFromAssets("apple"));
     }
 
     @Override

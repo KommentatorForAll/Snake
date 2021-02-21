@@ -12,12 +12,14 @@ public class Snakeworld extends World {
         super(10, 10, 64);
         Enginegames.Main.enableDebug = true;
         setTps(4);
-        setBackground(Util.loadImageFromAssets("bg_grass"));
+        setBackground(Utils.loadImageFromAssets("background_tile"));
         setBackgroundOption(WorldUI.ImageOption.TILED);
     }
 
     public void showDeathscreen() {
         System.out.println("you died");
+        removeAll();
+        setBackground(null);
         stop();
     }
 

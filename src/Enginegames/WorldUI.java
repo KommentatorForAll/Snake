@@ -58,18 +58,52 @@ public class WorldUI extends JPanel {
                 case STRETCHED:
                     int hscale = getHeight()/backgroundImage.getHeight(null);
                     int wscale = getWidth()/backgroundImage.getWidth(null);
-                    BufferedImage after = new BufferedImage(getWidth(), getHeight(), backgroundImage.getType());
+                    AdvancedImage after = new AdvancedImage(getWidth(), getHeight(), backgroundImage.getType());
                     AffineTransform scaleInstance = AffineTransform.getScaleInstance(wscale, hscale);
                     AffineTransformOp scaleOp = new AffineTransformOp(scaleInstance, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
                     scaleOp.filter(backgroundImage, after);
                     g.drawImage(after, 0,0,null);
+                    break;
 
                 case NONE:
                 default:
                     g.drawImage(backgroundImage, 0,0,null);
                     break;
             }
-        objs.forEach((obj, pos) -> g.drawImage(obj.img, pos[0]*pxsize, pos[1]*pxsize, null));
+        objs.forEach((obj, pos) -> {
+            AdvancedImage img = obj.img;
+            int x = pos[0]*pxsize, y = pos[1]*pxsize;
+
+            AdvancedImage i = new AdvancedImage(pxsize, pxsize, img.getType());
+            int wx = 0, wy = 0, iw = img.getWidth(), ih = img.getHeight();
+            switch (obj.img.imgs) {
+                case TILE:
+                    while (wy < pxsize) {
+                        while (wx < pxsize) {
+                            i.drawImage(img, wx, wy, 1);
+                            wx += iw;
+                        }
+                        wx = 0;
+                        wy += ih;
+                    }
+                    break;
+                case STRETCH:
+                    i = img.scale(pxsize, pxsize);
+                    break;
+
+                case NONE:
+                    i = new AdvancedImage(img);
+                    break;
+            }
+            if (img.imgs == AdvancedImage.ImageSizing.NONE)
+                switch (img.imgpos) {
+                    case CENTER:
+                        x += pxsize/2-obj.img.getWidth(null)/2;
+                        y += pxsize/2-obj.img.getHeight(null)/2;
+                }
+            g.drawImage(i, x, y, null);
+        });
+        //objs.forEach((obj, pos) -> g.drawImage(obj.img, pos[0]*pxsize+pxsize/2-obj.img.getWidth(null)/2, pos[1]*pxsize+pxsize/2-obj.img.getHeight(null)/2, null));
     }
 
     public enum ImageOption {
