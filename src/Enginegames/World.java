@@ -1,18 +1,23 @@
 package Enginegames;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
-public abstract class World implements Tickable, KeyListener {
+public abstract class World implements Tickable, KeyListener, MouseListener {
 
     public int pixelSize;
     public int width, height;
     public ArrayList<WorldObj> objects, toRemove = new ArrayList<>(), toAdd = new ArrayList<>();
     public Queue<KeyEventInfo> keys = new ConcurrentLinkedQueue<>();
+    public Queue<MouseEventInfo> clicks = new ConcurrentLinkedQueue<>();
     public static Engine e = new Engine(20);
     public boolean hardEdge;
     public WorldUI ui;
@@ -60,6 +65,7 @@ public abstract class World implements Tickable, KeyListener {
         toAdd.clear();
         tick();
         handleKeys();
+        handleMouse();
         objects.forEach(WorldObj::_tick);
         objects.removeAll(toRemove);
         objects.addAll(toAdd);
@@ -179,6 +185,73 @@ public abstract class World implements Tickable, KeyListener {
     public void keyPressed(int key){}
 
     public void keyReleased(int key){}
+
+    public final void mousePressed(MouseEvent e) {
+        clicks.add(new MouseEventInfo(e, MouseEventInfo.MOUSE_PRESSED));
+    }
+
+    public void mousePressed(MouseEvent e, WorldObj obj) {}
+
+
+    public final void mouseClicked(MouseEvent e) {
+        clicks.add(new MouseEventInfo(e, MouseEventInfo.MOUSE_CLICKED));
+    }
+
+    public void mouseClicked(MouseEvent e, WorldObj obj) {}
+
+
+    public final void mouseReleased(MouseEvent e) {
+        clicks.add(new MouseEventInfo(e, MouseEventInfo.MOUSE_RELEASED));
+    }
+
+    public void mouseReleased(MouseEvent e, WorldObj obj) {}
+
+    public final void mouseEntered(MouseEvent e) {
+        clicks.add(new MouseEventInfo(e, MouseEventInfo.MOUSE_ENTERED));
+    }
+
+    public void mouseEntered(MouseEvent e, WorldObj obj) {}
+
+    public final void mouseExited(MouseEvent e) {
+        clicks.add(new MouseEventInfo(e,MouseEventInfo.MOUSE_EXITED));
+    }
+
+    public void mouseExited(MouseEvent e, WorldObj obj) {}
+
+    public void handleMouse() {
+        MouseEventInfo e;
+        Point p, uiLocation = ui.getLocation();
+        int[] absPos, relativePos;
+        WorldObj o;
+        List<WorldObj> objs;
+        while ((e = clicks.poll()) != null)
+        {
+            p = e.e.getPoint();
+            absPos = new int[] {p.x-uiLocation.x, p.y - uiLocation.y};
+            relativePos = new int[] {absPos[0]/pixelSize, absPos[1]/pixelSize};
+            objs = objectsAt(relativePos[0], relativePos[1], WorldObj.class);
+            o = objs.isEmpty()? null : objs.get(0);
+            MouseEventInfo finalE = e;
+            switch (e.type) {
+                case MouseEventInfo.MOUSE_PRESSED:
+                    mousePressed(e.e, o);
+                    break;
+                case MouseEventInfo.MOUSE_CLICKED:
+                    mouseClicked(e.e, o);
+                    break;
+                case MouseEventInfo.MOUSE_RELEASED:
+                    mouseReleased(e.e, o);
+                    break;
+                case MouseEventInfo.MOUSE_ENTERED:
+                    mouseEntered(e.e, o);
+                    break;
+                case MouseEventInfo.MOUSE_EXITED:
+                    mouseExited(e.e, o);
+            }
+            objs.forEach(ob -> ob.mouseEvent(finalE));
+        }
+    }
+
 
     private static class KeyEventInfo {
         public int type;

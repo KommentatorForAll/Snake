@@ -2,6 +2,7 @@ package Enginegames;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 
@@ -48,6 +49,8 @@ public abstract class WorldObj implements Tickable {
     public final void setImage(String name) throws IOException {
         img = new AdvancedImage(ImageIO.read(new File(name)));
     }
+
+    public void mouseEvent(MouseEventInfo e) {}
 
     public final void _tick() {
         tick();

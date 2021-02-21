@@ -9,6 +9,10 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
     public ImagePosition imgpos = ImagePosition.CENTER;
     public ImageSizing imgs = ImageSizing.NONE;
 
+    public AdvancedImage(int width, int height) {
+        super(width, height, TYPE_INT_ARGB);
+    }
+
     public AdvancedImage(int width, int height, int imageType) {
         super(width, height, imageType);
     }
@@ -40,7 +44,7 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
 
     public void drawImage(AdvancedImage img, int x, int y, float opaque) {
         int mw = getWidth(), mh = getHeight(), iw = img.getWidth(), ih = img.getHeight(), wx = x, wy = y;
-        AdvancedImage i = img.clone();
+        AdvancedImage i;
         switch (img.imgs) {
             case TILE:
                 i = new AdvancedImage(img);
@@ -54,10 +58,11 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
                 }
                 break;
             case STRETCH:
-                i = i.scale(mw-x, mw-y);
+                i = img.scale(mw-x, mw-y);
                 break;
 
             case NONE:
+            default:
                 i = new AdvancedImage(img);
                 break;
         }
@@ -69,6 +74,10 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
             case CENTER:
                 drawImage_((BufferedImage) i, x-i.getWidth()/2, y-i.getHeight()/2, opaque);
         }
+    }
+
+    public void drawString(String str, int x, int y) {
+
     }
 
     public AdvancedImage scale(int width, int height) {
@@ -140,6 +149,94 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         return i;
     }
 
+    public AdvancedImage replaceColor(Color oldColor, Color newColor) {
+        return replaceColor(this, oldColor, newColor);
+    }
+
+    public AdvancedImage replaceColor(int oldColor, int newColor) {
+        return replaceColor(this, oldColor, newColor);
+    }
+
+    public static AdvancedImage replaceColor(AdvancedImage image, Color target, Color preferred) {
+        return replaceColor(image, target.getRGB(), preferred.getRGB());
+    }
+
+    public static AdvancedImage replaceColor(AdvancedImage image, int target, int preferred) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+        AdvancedImage newImage = new AdvancedImage(width, height, image.getType());
+        int color;
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                color = image.getRGB(i, j);
+                if (color == target) {
+                    newImage.setRGB(i, j, preferred);
+                }
+                else {
+                    newImage.setRGB(i, j, color);
+                }
+            }
+        }
+
+        return newImage;
+    }
+
+    public void drawText(Color color, Font font, String text, int x, int y) {
+        drawText(color, font, text, x, y, VerticalAlignment.CENTER, HorizontalAlignment.CENTER);
+    }
+
+    public void drawText(Color color, Font font, String text, int x, int y, VerticalAlignment verticalAlignment, HorizontalAlignment horizontalAlignment)
+    {
+        Graphics2D graphics = createGraphics();
+        if (graphics == null)
+        {
+            System.err.println("No valid graphics");
+            return;
+        }
+
+        graphics.setColor(color);
+        graphics.setFont(font);
+
+        if (x < 0 || x >= getWidth())
+        {
+            x = getWidth() / 2;
+        }
+        if (y < 0 || y >= getHeight())
+        {
+            y = getHeight() / 2;
+        }
+
+        graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        String[] lines = text.split("[\n\r]");
+        FontMetrics fontMetrics = graphics.getFontMetrics(font);
+        int height = fontMetrics.getHeight();
+        if(verticalAlignment == VerticalAlignment.CENTER)
+        {
+            y -= (height * (lines.length / 2));
+        }
+        if (verticalAlignment == VerticalAlignment.BOTTOM)
+        {
+            y -= height * lines.length;
+        }
+        y += (height / 4);
+        for (int i = 0; i < lines.length; i++)
+        {
+            int modX = x;
+            if(horizontalAlignment == HorizontalAlignment.CENTER)
+            {
+                modX = x - (fontMetrics.stringWidth(lines[i]) / 2);
+            }
+            if(horizontalAlignment == HorizontalAlignment.RIGHT)
+            {
+                modX = x - fontMetrics.stringWidth(lines[i]);
+            }
+            graphics.drawString(lines[i], modX, y + i * height);
+        }
+
+        graphics.dispose();
+    }
+
     public enum ImagePosition {
         TOP_LEFT,
         CENTER
@@ -149,5 +246,19 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         NONE,
         TILE,
         STRETCH
+    }
+
+    enum VerticalAlignment
+    {
+        TOP,
+        CENTER,
+        BOTTOM
+    }
+
+    enum HorizontalAlignment
+    {
+        LEFT,
+        CENTER,
+        RIGHT
     }
 }
