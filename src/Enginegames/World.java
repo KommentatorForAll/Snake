@@ -61,14 +61,14 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
 
 
     public final void _tick() {
-        toRemove.clear();
-        toAdd.clear();
         tick();
         handleKeys();
         handleMouse();
         objects.forEach(WorldObj::_tick);
         objects.removeAll(toRemove);
         objects.addAll(toAdd);
+        toRemove.clear();
+        toAdd.clear();
         ui.paint(objects);
     }
 
@@ -254,7 +254,7 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
 
 
     @SafeVarargs
-    public final <T extends WorldObj> void setPaintOrder(Class<T>... classes) {
+    public final void setPaintOrder(Class<? extends WorldObj> ... classes) {
         ui.setPaintOrder(classes);
     }
 

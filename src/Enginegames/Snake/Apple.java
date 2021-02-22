@@ -1,5 +1,6 @@
 package Enginegames.Snake;
 
+import Enginegames.AdvancedImage;
 import Enginegames.Utils;
 import Enginegames.World;
 import Enginegames.WorldObj;
@@ -8,6 +9,7 @@ public class Apple extends WorldObj {
 
     public Apple() {
         setImage(Utils.loadImageFromAssets("apple"));
+        img.imgs = AdvancedImage.ImageSizing.STRETCH;
     }
 
     @Override

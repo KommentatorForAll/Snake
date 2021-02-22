@@ -3,57 +3,52 @@ package Enginegames;
 import java.awt.*;
 import java.util.*;
 
-public class Button extends WorldObj {
-    public String name, text;
-    public java.awt.Font font;
-    public java.awt.Color textColor = Color.WHITE, backgroundColor = Color.BLACK, bgColorHover = Color.BLACK;
-    public int width, height;
-    public boolean dynamic;
-    public AdvancedImage defaultImage;
+public abstract class Button extends WorldObj {
 
+    public String text;
+    public int width, height, borderWidth;
+    public Color textColor = Color.BLACK, backgroundColor = Color.WHITE, backgroundHoverColor = Color.LIGHT_GRAY, borderColor = Color.BLACK;
+    public Font font;
+    public AdvancedImage backgroundImage;
 
     public Button() {
-        this("","",400,100);
+        text = "test";
+        width = 400;
+        height = 100;
+        font = new Font(Font.SERIF, Font.PLAIN, 20);
+        borderWidth = 5;
+        update();
     }
 
-    public Button(String name, String text, int width, int height) {
-        this(name, text, width, height, Color.WHITE, Font.getFont(Font.SERIF));
+    public void update() {
+        AdvancedImage img = new AdvancedImage(width, height);
+        img.fill(borderColor);
+        img.drawRect(borderWidth, borderWidth, width-(borderWidth*2), height-(borderWidth*2), backgroundColor);
+        if (backgroundImage != null) img.drawImage(backgroundImage);
+        if (!text.isEmpty()) img.drawText(textColor, font, text);
+        System.out.println(img);
+        setImage(img);
     }
 
-    public Button(String name, String text, int width, int height, Color textColor, Font font, boolean dynamic) {
-        this.textColor = textColor;
-        this.font = font;
-        this.name = name;
-        this.text = text;
-        this.width = width;
-        this.height = height;
-        this.dynamic = dynamic;
-        defaultImage = new AdvancedImage(width, height);
-        if (!text.isBlank()) {
-            updateText(text);
+    public void mouseEvent(MouseEventInfo e) {
+        if (e.type == MouseEventInfo.MOUSE_PRESSED) {
+            Color tmp = backgroundColor;
+            backgroundColor = backgroundHoverColor;
+            backgroundHoverColor = tmp;
+            update();
+        }
+
+        else if (e.type == MouseEventInfo.MOUSE_CLICKED) {
+            clickEvent();
+        }
+
+        else if (e.type == MouseEventInfo.MOUSE_RELEASED) {
+            Color tmp = backgroundColor;
+            backgroundColor = backgroundHoverColor;
+            backgroundHoverColor = tmp;
+            update();
         }
     }
 
-    public Button(String name, String text, java.awt.Font font, java.awt.Color color) {
-        this(name, text, 400, 100, color, font);
-    }
-
-    public Button(String name, String text, int width, int height, Color color, Font font) {
-        this(name, text, width, height, color, font, false);
-    }
-
-    public void tick() {
-
-    }
-
-    public void updateText(String text) {
-        updateText(text, defaultImage);
-    }
-
-    public void updateText(String text, AdvancedImage img) {
-        this.text = text;
-        AdvancedImage textImg = img.clone();
-        textImg.drawText(textColor, font, text, img.getWidth()/2, img.getHeight()/2);
-        setImage(textImg);
-    }
+    public abstract void clickEvent();
 }

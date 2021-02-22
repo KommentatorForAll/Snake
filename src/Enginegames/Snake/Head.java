@@ -19,6 +19,7 @@ public class Head extends Enginegames.Snake.Tile {
         //commonImage.imgs = AdvancedImage.ImageSizing.TILE;
         size = 2;
         world.addObject(this, x, y);
+        commonImage.imgs = AdvancedImage.ImageSizing.STRETCH;
         setImage(commonImage);
         Tile mid = new Tile(this, 0,1), tail = new Tile(this,0, 2);
         world.addObject(mid, x, y-1);

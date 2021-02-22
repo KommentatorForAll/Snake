@@ -5,22 +5,26 @@ import Enginegames.*;
 public class Snakeworld extends World {
 
     public int t = 0;
-    public boolean started = false, running = false;
+    public boolean started = false, running = false, wasDead;
     public Head head;
 
     public Snakeworld() {
         super(30, 25, 32);
-        Enginegames.Main.enableDebug = true;
+        Enginegames.Main.enableDebug = false;
+        Button b = new Label();
+        addObject(b, 1,1);
         setTps(16);
+        setPaintOrder(Head.class, Tile.class, Apple.class, Button.class);
         setBackground(Utils.loadImageFromAssets("background_tile"));
         setBackgroundOption(WorldUI.ImageOption.TILED);
     }
 
     public void showDeathscreen() {
         System.out.println("you died");
-        //removeAll();
-        setBackground(null);
-        stop();
+        wasDead = true;
+        removeAll();
+        //setBackground(null);
+        //stop();
     }
 
     public void tick() {
@@ -47,10 +51,17 @@ public class Snakeworld extends World {
     }
 
     public void keyPressed(int key) {
-        System.out.println("Key pressed: "+key);
+        if (Main.enableDebug)
+            System.out.println("Key pressed: "+key);
         if (key == ' ') {
             if (head == null) begin();
             else resume();
+            if (wasDead) {
+                System.out.println("has been dead");
+                wasDead = false;
+                removeAll();
+                begin();
+            }
         }
         if (key == 27) { //escape
             pause();

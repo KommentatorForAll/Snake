@@ -21,9 +21,8 @@ public class Utils {
             return null;
         }
     }
-
+    
     public static AdvancedImage loadImageFromAssets(String filename) {
-        System.out.println(System.getProperty("user.dir"));
         return loadImage(System.getProperty("user.dir")+"/assets/" +filename);
     }
 

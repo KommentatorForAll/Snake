@@ -15,7 +15,7 @@ public class WorldUI extends JPanel {
     public ImageOption bgOption;
 
     public List<WorldObj> objs;
-    public Class<? extends WorldObj>[] paintOrder;
+    public List<Class<? extends WorldObj>> paintOrder;
     public int pxsize;
 
     public WorldUI(int width, int height) {
@@ -25,6 +25,7 @@ public class WorldUI extends JPanel {
     public WorldUI(int width, int height, ImageOption bgOption, int pxsize, KeyListener kl) {
         super();
         objs = new ArrayList<>();
+        paintOrder = new ArrayList<>();
         this.bgOption = bgOption;
         setSize(width, height);
         setPreferredSize(getSize());
@@ -71,7 +72,7 @@ public class WorldUI extends JPanel {
                     g.drawImage(backgroundImage, 0,0,null);
                     break;
             }
-        objs.forEach((obj) -> {
+        sortObjects(objs).forEach((obj) -> {
             AdvancedImage img = obj.img;
             int x = obj.x*pxsize, y = obj.y*pxsize;
 
@@ -92,6 +93,10 @@ public class WorldUI extends JPanel {
                     i = img.scale(pxsize, pxsize);
                     break;
 
+                case CROP:
+                    i.drawImage(img, i.getWidth()/2, i.getHeight()/2);
+                    break;
+
                 case NONE:
                     i = new AdvancedImage(img);
                     break;
@@ -108,20 +113,21 @@ public class WorldUI extends JPanel {
     }
 
     public final Set<WorldObj> sortObjects(List<WorldObj> objs) {
-        LinkedHashSet<WorldObj> ret = new LinkedHashSet<>();
-        List<Class<?>> po = Arrays.asList(paintOrder);
+        List<Class<? extends WorldObj>> po = new ArrayList<>(paintOrder);
         Collections.reverse(po);
-        ret.addAll(objs);
-        po.stream().forEach(cls -> {
+        LinkedHashSet<WorldObj> ret = new LinkedHashSet<>(objs);
+        po.forEach(cls -> {
             for (WorldObj o : objs) {
-                if (cls.isInstance(o)) ret.add(o);
+                if (cls.isInstance(o)) {
+                    ret.remove(o);
+                    ret.add(o);
+                }
             }});
-
         return ret;
     }
 
-    public final <T extends WorldObj> void setPaintOrder(Class<T>... classes) {
-        paintOrder = classes;
+    public final void setPaintOrder(Class<? extends WorldObj>... classes) {
+        paintOrder = Arrays.asList(classes);
     }
 
     public enum ImageOption {

@@ -26,6 +26,7 @@ public class Tile extends WorldObj {
         this.dir = dir;
         this.age = age;
         selectImage();
+        img.imgs = AdvancedImage.ImageSizing.STRETCH;
         //setImage(Util.loadImageFromAssets("python"));
     }
 
@@ -55,6 +56,7 @@ public class Tile extends WorldObj {
         }
         if (age == head.size-1) {
             setImage(AdvancedImage.rotateImageByDegrees(tail, (dir%4)*90+180));
+            img.imgs = AdvancedImage.ImageSizing.STRETCH;
         }
     }
 }

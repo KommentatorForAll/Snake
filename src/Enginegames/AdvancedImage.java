@@ -42,6 +42,18 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         g2d.dispose();
     }
 
+    public void drawImage(AdvancedImage img) {
+        int x = 0, y = 0;
+        switch (img.imgpos) {
+            case CENTER:
+                x = getWidth()/2;
+                y = getHeight()/2;
+                break;
+
+        }
+        drawImage(img, x, y, 1);
+    }
+
     public void drawImage(AdvancedImage img, int x, int y, float opaque) {
         int mw = getWidth(), mh = getHeight(), iw = img.getWidth(), ih = img.getHeight(), wx = x, wy = y;
         AdvancedImage i;
@@ -77,7 +89,6 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
     }
 
     public void drawString(String str, int x, int y) {
-
     }
 
     public AdvancedImage scale(int width, int height) {
@@ -88,8 +99,8 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
 //            g.drawImage(this, 0, 0, width, height, (ImageObserver)null);
 //            g.dispose();
 //        }
-        int hscale = width/getHeight(null);
-        int wscale = height/getWidth(null);
+        double hscale = 1.0*height/getHeight(null);
+        double wscale = 1.0*width/getWidth(null);
         AdvancedImage after = new AdvancedImage(width, height, getType());
         AffineTransform scaleInstance = AffineTransform.getScaleInstance(wscale, hscale);
         AffineTransformOp scaleOp = new AffineTransformOp(scaleInstance, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
@@ -182,6 +193,24 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         return newImage;
     }
 
+    public void fill(Color clr) {
+        drawRect(0,0, getWidth(), getHeight(), clr);
+    }
+
+    public void drawRect(int x, int y, int width, int height, Color clr) {
+        Graphics2D g = createGraphics();
+        g.setColor(clr);
+        g.drawRect(x,y, width, height);
+        g.dispose();
+    }
+
+    public void drawOval(int x, int y, int width, int height, Color clr) {
+        Graphics2D g = createGraphics();
+        g.setColor(clr);
+        g.drawOval(x,y, width, height);
+        g.dispose();
+    }
+
     public void drawText(Color color, Font font, String text, int x, int y) {
         drawText(color, font, text, x, y, VerticalAlignment.CENTER, HorizontalAlignment.CENTER);
     }
@@ -237,6 +266,10 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         graphics.dispose();
     }
 
+    public void drawText(Color color, Font font, String text) {
+        drawText(color, font, text, getWidth()/2, getHeight()/2);
+    }
+
     public enum ImagePosition {
         TOP_LEFT,
         CENTER
@@ -245,7 +278,8 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
     public enum ImageSizing {
         NONE,
         TILE,
-        STRETCH
+        STRETCH,
+        CROP
     }
 
     enum VerticalAlignment
