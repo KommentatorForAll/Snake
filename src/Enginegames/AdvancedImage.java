@@ -34,7 +34,7 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         drawImage_(img, x, y, opaque);
     }
 
-    public void drawImage_(BufferedImage image, int x, int y, float opaque) {
+    private void drawImage_(BufferedImage image, int x, int y, float opaque) {
         Graphics2D g2d = createGraphics();
         g2d.setComposite(
                 AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opaque));

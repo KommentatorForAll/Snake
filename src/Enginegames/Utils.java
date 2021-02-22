@@ -23,7 +23,8 @@ public class Utils {
     }
 
     public static AdvancedImage loadImageFromAssets(String filename) {
-        return loadImage(System.getProperty("user.dir")+"\\assets\\" +filename);
+        System.out.println(System.getProperty("user.dir"));
+        return loadImage(System.getProperty("user.dir")+"/assets/" +filename);
     }
 
     public static int[] getStringDimensions(java.awt.Font font, String text) {

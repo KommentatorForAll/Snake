@@ -6,7 +6,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 
-public abstract class WorldObj implements Tickable {
+public abstract class WorldObj implements Tickable, Comparable<WorldObj> {
 
     public int x, y;
     public AdvancedImage img;
@@ -69,14 +69,10 @@ public abstract class WorldObj implements Tickable {
     }
 
     public String toString() {
-        String s = super.toString();
-        s += "; in world: ";
-        if (world == null) {
-            s+="none";
-        }
-        else {
-            s+= world + "; at position x=" + x + ", y=" + y;
-        }
-        return s;
+        return super.toString() + "; in world: " + (world==null? "none" : world + "; at position x="+x+", y="+y);
+    }
+
+    public int compareTo(WorldObj obj) {
+        return 0;
     }
 }

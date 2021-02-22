@@ -7,7 +7,7 @@ public class Engine {
 
     public long ttime, tick;
     public double tps;
-    public boolean started;
+    public boolean started, terminateOnError;
     public List<Tickable> tickables;
 
     /**
@@ -21,6 +21,10 @@ public class Engine {
         start();
     }
 
+    /**
+     * Main function of the Engine. Each loop, a new Tickthread is started, Afterwards it waits mspt milliseconds and terminates the thread afterwards. (Support for switching between lag and skipping may be implemented later)
+     * Prints error message, when errors occur during the loop, but does not terminate
+     */
     public void loop() {
         long cur;
         tick = 0;
@@ -36,9 +40,15 @@ public class Engine {
                 Thread.sleep((long) (1000/tps));
                 t.join((int)(1000/tps));
             }
+            catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                System.err.println("Error while ticking");;
+                e.printStackTrace();
+            }
             catch (Exception e) {
                 Thread.currentThread().interrupt();
-                System.err.println("Error while ticking");
+                System.err.println("Error while ticking");;
+                if (terminateOnError) throw e;
                 e.printStackTrace();
             }
         }

@@ -9,16 +9,16 @@ public class Snakeworld extends World {
     public Head head;
 
     public Snakeworld() {
-        super(10, 10, 64);
+        super(30, 25, 32);
         Enginegames.Main.enableDebug = true;
-        setTps(4);
+        setTps(16);
         setBackground(Utils.loadImageFromAssets("background_tile"));
         setBackgroundOption(WorldUI.ImageOption.TILED);
     }
 
     public void showDeathscreen() {
         System.out.println("you died");
-        removeAll();
+        //removeAll();
         setBackground(null);
         stop();
     }

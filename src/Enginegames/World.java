@@ -253,6 +253,11 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
     }
 
 
+    @SafeVarargs
+    public final <T extends WorldObj> void setPaintOrder(Class<T>... classes) {
+        ui.setPaintOrder(classes);
+    }
+
     private static class KeyEventInfo {
         public int type;
         public KeyEvent e;

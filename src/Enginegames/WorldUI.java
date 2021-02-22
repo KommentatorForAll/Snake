@@ -6,15 +6,16 @@ import java.awt.event.KeyListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
+import java.util.List;
 
 public class WorldUI extends JPanel {
 
     public BufferedImage backgroundImage;
     public ImageOption bgOption;
 
-    public HashMap<WorldObj, int[]> objs;
+    public List<WorldObj> objs;
+    public Class<? extends WorldObj>[] paintOrder;
     public int pxsize;
 
     public WorldUI(int width, int height) {
@@ -23,7 +24,7 @@ public class WorldUI extends JPanel {
 
     public WorldUI(int width, int height, ImageOption bgOption, int pxsize, KeyListener kl) {
         super();
-        objs = new HashMap<>();
+        objs = new ArrayList<>();
         this.bgOption = bgOption;
         setSize(width, height);
         setPreferredSize(getSize());
@@ -39,8 +40,8 @@ public class WorldUI extends JPanel {
     }
 
     public void paint(ArrayList<WorldObj> objects) {
-        objs = new HashMap<>();
-        objects.forEach((o) -> objs.put(o, new int[] {o.x,o.y}));
+        objs = new ArrayList<>();
+        objs.addAll(objects);
         repaint();
     }
 
@@ -70,9 +71,9 @@ public class WorldUI extends JPanel {
                     g.drawImage(backgroundImage, 0,0,null);
                     break;
             }
-        objs.forEach((obj, pos) -> {
+        objs.forEach((obj) -> {
             AdvancedImage img = obj.img;
-            int x = pos[0]*pxsize, y = pos[1]*pxsize;
+            int x = obj.x*pxsize, y = obj.y*pxsize;
 
             AdvancedImage i = new AdvancedImage(pxsize, pxsize, img.getType());
             int wx = 0, wy = 0, iw = img.getWidth(), ih = img.getHeight();
@@ -104,6 +105,23 @@ public class WorldUI extends JPanel {
             g.drawImage(i, x, y, null);
         });
         //objs.forEach((obj, pos) -> g.drawImage(obj.img, pos[0]*pxsize+pxsize/2-obj.img.getWidth(null)/2, pos[1]*pxsize+pxsize/2-obj.img.getHeight(null)/2, null));
+    }
+
+    public final Set<WorldObj> sortObjects(List<WorldObj> objs) {
+        LinkedHashSet<WorldObj> ret = new LinkedHashSet<>();
+        List<Class<?>> po = Arrays.asList(paintOrder);
+        Collections.reverse(po);
+        ret.addAll(objs);
+        po.stream().forEach(cls -> {
+            for (WorldObj o : objs) {
+                if (cls.isInstance(o)) ret.add(o);
+            }});
+
+        return ret;
+    }
+
+    public final <T extends WorldObj> void setPaintOrder(Class<T>... classes) {
+        paintOrder = classes;
     }
 
     public enum ImageOption {
