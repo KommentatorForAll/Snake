@@ -2,6 +2,9 @@ package Enginegames;
 
 import java.awt.event.MouseEvent;
 
+/**
+ * Wrapper class, to contain both, the event type of a mouseevent, as well as the event itself.
+ */
 public class MouseEventInfo {
     public static final int MOUSE_PRESSED = 0,
             MOUSE_CLICKED = 1,

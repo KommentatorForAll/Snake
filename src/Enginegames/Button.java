@@ -7,7 +7,7 @@ public abstract class Button extends WorldObj {
 
     public String text;
     public int width, height, borderWidth;
-    public Color textColor = Color.BLACK, backgroundColor = Color.WHITE, backgroundHoverColor = Color.LIGHT_GRAY, borderColor = Color.BLACK;
+    public Color textColor = new Color(0,0,0,255), backgroundColor = new Color(255,255,255,255), backgroundHoverColor = Color.LIGHT_GRAY, borderColor = new Color(0,0,0,255);
     public Font font;
     public AdvancedImage backgroundImage;
 
@@ -31,6 +31,8 @@ public abstract class Button extends WorldObj {
     }
 
     public void mouseEvent(MouseEventInfo e) {
+        //if (Main.enableDebug)
+        System.out.println("called event");
         if (e.type == MouseEventInfo.MOUSE_PRESSED) {
             Color tmp = backgroundColor;
             backgroundColor = backgroundHoverColor;

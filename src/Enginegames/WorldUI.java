@@ -17,6 +17,7 @@ public class WorldUI extends JPanel {
     public List<WorldObj> objs;
     public List<Class<? extends WorldObj>> paintOrder;
     public int pxsize;
+    public double bg_opaque=1;
 
     public WorldUI(int width, int height) {
         this(width, height, ImageOption.NONE,1, null);
@@ -29,17 +30,26 @@ public class WorldUI extends JPanel {
         this.bgOption = bgOption;
         setSize(width, height);
         setPreferredSize(getSize());
-        setMaximumSize(getSize());
+        //setMaximumSize();
         setVisible(true);
         this.pxsize = pxsize;
         addKeyListener(kl);
     }
 
+    /**
+     * sets the background image.
+     * !!may cause graphical bugs, when image is null or trans parent!!
+     * @param img the new background image
+     */
     public void setBackground(BufferedImage img) {
         backgroundImage = img;
         repaint();
     }
 
+    /**
+     * paints the given objects
+     * @param objects the objects to be pain(ted)
+     */
     public void paint(ArrayList<WorldObj> objects) {
         objs = new ArrayList<>();
         objs.addAll(objects);
@@ -47,31 +57,39 @@ public class WorldUI extends JPanel {
     }
 
     public void paintComponent(Graphics g) {
-        if (backgroundImage != null)
-            switch(bgOption) {
+        if (backgroundImage != null) {
+            ((Graphics2D) g).setComposite(
+                    AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) bg_opaque));
+            switch (bgOption) {
                 case TILED:
-                    for (int x = 0; x < getWidth(); x+= backgroundImage.getWidth(null)) {
-                        for (int y = 0; y < getHeight(); y+= backgroundImage.getHeight(null)) {
-                            g.drawImage(backgroundImage, x,y,null);
+                    AdvancedImage tmp = (new AdvancedImage(backgroundImage)).scale(pxsize, pxsize);
+                    for (int x = 0; x < getWidth(); x += pxsize) {
+                        for (int y = 0; y < getHeight(); y += pxsize) {
+                            g.drawImage(tmp, x, y, null);
                         }
                     }
                     break;
 
                 case STRETCHED:
-                    int hscale = getHeight()/backgroundImage.getHeight(null);
-                    int wscale = getWidth()/backgroundImage.getWidth(null);
+                    int hscale = getHeight() / backgroundImage.getHeight(null);
+                    int wscale = getWidth() / backgroundImage.getWidth(null);
                     AdvancedImage after = new AdvancedImage(getWidth(), getHeight(), backgroundImage.getType());
                     AffineTransform scaleInstance = AffineTransform.getScaleInstance(wscale, hscale);
                     AffineTransformOp scaleOp = new AffineTransformOp(scaleInstance, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
                     scaleOp.filter(backgroundImage, after);
-                    g.drawImage(after, 0,0,null);
+                    g.drawImage(after, 0, 0, null);
                     break;
 
                 case NONE:
                 default:
-                    g.drawImage(backgroundImage, 0,0,null);
+                    g.drawImage(backgroundImage, 0, 0, null);
                     break;
+
             }
+            ((Graphics2D)g).setComposite(
+                    AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1F));
+        }
+
         sortObjects(objs).forEach((obj) -> {
             AdvancedImage img = obj.img;
             int x = obj.x*pxsize, y = obj.y*pxsize;
@@ -112,6 +130,11 @@ public class WorldUI extends JPanel {
         //objs.forEach((obj, pos) -> g.drawImage(obj.img, pos[0]*pxsize+pxsize/2-obj.img.getWidth(null)/2, pos[1]*pxsize+pxsize/2-obj.img.getHeight(null)/2, null));
     }
 
+    /**
+     * returns a sorted set of the objects, sorted by the pain order
+     * @param objs the objects to be sorted
+     * @return a sorted set
+     */
     public final Set<WorldObj> sortObjects(List<WorldObj> objs) {
         List<Class<? extends WorldObj>> po = new ArrayList<>(paintOrder);
         Collections.reverse(po);
@@ -126,8 +149,17 @@ public class WorldUI extends JPanel {
         return ret;
     }
 
+    /**
+     * sets the pain order
+     * @param classes the paint order
+     */
+    @SafeVarargs
     public final void setPaintOrder(Class<? extends WorldObj>... classes) {
         paintOrder = Arrays.asList(classes);
+    }
+
+    public void setBackgroundOpaqueness(double opaque) {
+        bg_opaque = opaque;
     }
 
     public enum ImageOption {

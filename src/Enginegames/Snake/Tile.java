@@ -6,9 +6,9 @@ import java.awt.image.BufferedImage;
 
 public class Tile extends WorldObj {
 
-    public static AdvancedImage line = AdvancedImage.rotateImageByDegrees(Utils.loadImageFromAssets("python"),90);
-    public static AdvancedImage corner = Utils.loadImageFromAssets("corner");
-    public static AdvancedImage tail = AdvancedImage.rotateImageByDegrees(Utils.loadImageFromAssets("tail"),-90);
+    public static AdvancedImage line = AdvancedImage.rotateImageByDegrees(Utils.loadImageFromAssets("snake_body"),90);
+    public static AdvancedImage corner = Utils.loadImageFromAssets("snake_corner");
+    public static AdvancedImage tail = AdvancedImage.rotateImageByDegrees(Utils.loadImageFromAssets("snake_tail"),-90);
 
 
     public Head head;

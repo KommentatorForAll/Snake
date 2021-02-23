@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
 import java.util.Arrays;
 
 public class GameUI extends JFrame {
@@ -18,27 +19,31 @@ public class GameUI extends JFrame {
     }
 
     public GameUI(String name, JPanel worldUI) {
-        this(name, worldUI, true, null);
+        this(name, worldUI, true, null, null);
     }
 
     public GameUI(String name, World world, boolean adContaminated) {
-        this(name, world.ui, adContaminated, null);
+        this(name, world.ui, adContaminated, null, null);
     }
 
-    public GameUI(String name, JPanel worldUI, boolean adContaminated, KeyListener kl) {
+    public GameUI(String name, JPanel worldUI, boolean adContaminated, KeyListener kl, MouseListener ml) {
         super(name);
         setLayout(null);
+        //setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+
         int x = worldUI.getWidth(), y = worldUI.getHeight();
         if (adContaminated) {
             x += 600;
             y += 200;
         }
         addKeyListener(kl);
+        addMouseListener(ml);
         setVisible(true);
 
         int[] bardim = getBorderDims();
-        System.out.println(Arrays.toString(bardim));
+        if (Main.enableDebug)
+            System.out.println("Bar dimension: "+Arrays.toString(bardim));
         Dimension d = new Dimension(x+bardim[0], y+bardim[1]);
         setSize(d);
         setMinimumSize(d);
@@ -57,6 +62,10 @@ public class GameUI extends JFrame {
         });
     }
 
+    /**
+     * returns a list of monitors, connected to the pc
+     * @return a list of graphics devices
+     */
     public GraphicsDevice[] getMonitors() {
         GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] devices = g.getScreenDevices();
@@ -68,6 +77,10 @@ public class GameUI extends JFrame {
         return devices;
     }
 
+    /**
+     * returns the position of the last moitor as {x, y}
+     * @return the positio the last mointor starts at.
+     */
     public int[] getLastMonitorPosition() {
         int x = 100;
         int y = 100;
@@ -77,6 +90,10 @@ public class GameUI extends JFrame {
         return new int[] {x,y};
     }
 
+    /**
+     * returns the dimension of the toolbar.
+     * @return dimension of the toolbar
+     */
     public int[] getBorderDims() {
         Dimension size = getSize();
         Insets insets = getInsets();

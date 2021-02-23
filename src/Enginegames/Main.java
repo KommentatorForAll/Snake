@@ -15,7 +15,7 @@ public class Main {
 
     public Main(boolean isAdContaminated) {
         world = new Snakeworld();
-        window = new GameUI("Snake", world.ui, isAdContaminated, world);
+        window = new GameUI("Snake", world.ui, isAdContaminated, world, world);
         window.setIconImage(Utils.loadImageFromAssets("title"));
         window.setVisible(true);
     }

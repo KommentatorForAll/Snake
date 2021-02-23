@@ -10,7 +10,7 @@ public class Head extends Enginegames.Snake.Tile {
 
     public int size, lastdir;
     public boolean changedDir = false;
-    AdvancedImage commonImage = AdvancedImage.rotateImageByDegrees(Utils.loadImageFromAssets("head"), 90);
+    AdvancedImage commonImage = AdvancedImage.rotateImageByDegrees(Utils.loadImageFromAssets("snake_head"), 90);
 
 
     public Head(World world, int x, int y) {
@@ -64,6 +64,10 @@ public class Head extends Enginegames.Snake.Tile {
             size++;
             world.removeObject(world.objectsOf(Apple.class).get(0));
             Apple.generate(world);
+            Snakeworld world = (Snakeworld) this.world;
+            if (size >= world.sizingBorder*(world.width*world.height)) {
+                world.resizeField(1.1);
+            }
         }
     }
 
@@ -71,7 +75,6 @@ public class Head extends Enginegames.Snake.Tile {
         if (!changedDir)
         switch (key) {
             case (int)'w':
-                System.out.println("here");
                 if (dir != 2 && dir != 0) {
                     dir = 0;
                     changedDir = true;

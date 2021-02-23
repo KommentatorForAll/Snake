@@ -9,27 +9,59 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
     public ImagePosition imgpos = ImagePosition.CENTER;
     public ImageSizing imgs = ImageSizing.NONE;
 
+    /**
+     * Creates a new AdvancedImage of ARGB type.
+     * @param width width of the image
+     * @param height height of the image
+     */
     public AdvancedImage(int width, int height) {
         super(width, height, TYPE_INT_ARGB);
     }
 
+    /**
+     * Creates a new AdvancedImage.
+     * @param width width of the Image
+     * @param height height of the image
+     * @param imageType image type (see BufferedImage for more information)
+     */
     public AdvancedImage(int width, int height, int imageType) {
         super(width, height, imageType);
     }
 
+    /**
+     * Creates a new AdvancedImage from a buffered image
+     * @param img The Image, which shall be copied
+     */
     public AdvancedImage(BufferedImage img) {
         super(img.getWidth(), img.getHeight(), img.getType());
         drawImage(img);
     }
 
+    /**
+     * draws a BufferedImage onto this image.
+     * @param img
+     */
     public void drawImage(BufferedImage img) {
         drawImage(img, 0,0);
     }
 
+    /**
+     * Draws a BufferedImage onto this image at the given position
+     * @param img the image to be drawn
+     * @param x x position of the top left corner
+     * @param y y position of the top left corner
+     */
     public void drawImage(BufferedImage img, int x, int y) {
         drawImage(img, x, y, 1);
     }
 
+    /**
+     * Draws a BufferedImage onto this image at the given position
+     * @param img the image to be drawn
+     * @param x x position of the top left corner
+     * @param y y position of the top left corner
+     * @param opaque the opaqueness of the drawn image
+     */
     private void drawImage(BufferedImage img, int x, int y, float opaque) {
         drawImage_(img, x, y, opaque);
     }
@@ -42,6 +74,10 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         g2d.dispose();
     }
 
+    /**
+     * Draws an AdvancedImage onto this image, using its given position and sizing options
+     * @param img the image to be drawn
+     */
     public void drawImage(AdvancedImage img) {
         int x = 0, y = 0;
         switch (img.imgpos) {
@@ -54,6 +90,13 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         drawImage(img, x, y, 1);
     }
 
+    /**
+     * Draws an AdvancedImage onto this image, using its given position and sizing options
+     * @param img the image to be drawn
+     * @param x x position of the image
+     * @param y y position of the image
+     * @param opaque the opaqueness the image is drawn with
+     */
     public void drawImage(AdvancedImage img, int x, int y, float opaque) {
         int mw = getWidth(), mh = getHeight(), iw = img.getWidth(), ih = img.getHeight(), wx = x, wy = y;
         AdvancedImage i;
@@ -88,9 +131,12 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         }
     }
 
-    public void drawString(String str, int x, int y) {
-    }
-
+    /**
+     * Scales an image to the given dimensions
+     * @param width width of the new image
+     * @param height height of the new image
+     * @return a scaled version of the image
+     */
     public AdvancedImage scale(int width, int height) {
 //        if (width != getWidth() || height != getHeight()) {
 //            Graphics2D g = createGraphics();
@@ -108,6 +154,10 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         return after;
     }
 
+    /**
+     * Clones this image
+     * @return a fabric new clone. Produced to execute order 66
+     */
     public AdvancedImage clone() {
         BufferedImage img = deepCopy(this);
         AdvancedImage i = new AdvancedImage(img);
@@ -116,6 +166,11 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         return i;
     }
 
+    /**
+     * Returns a deep Copy of a given BufferedImage
+     * @param bi the image to be deep copied
+     * @return a new Buffered image, being an as deep copy of the original as its soul
+     */
     static BufferedImage deepCopy(BufferedImage bi) {
         ColorModel cm = bi.getColorModel();
         boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
@@ -123,14 +178,29 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
     }
 
+    /**
+     *
+     * @return stringyfied image information
+     */
     public String toString() {
-        return super.toString() + " of Dimension: " + getWidth() + "*" + getHeight();
+        return super.toString() + " sizing: " + imgs + "; Positioning: " + imgpos;
     }
 
+    /**
+     * rotates the image and puts it onto a new image
+     * @param angle the angle the image gets rotated by.
+     * @return a rotated version of this image
+     */
     public AdvancedImage rotate(double angle) {
         return rotateImageByDegrees(this, angle);
     }
 
+    /**
+     * rotates the image.
+     * @param img the image which is gonna be rotated
+     * @param angle the angle it gets rotated by
+     * @return a rotated image
+     */
     public static AdvancedImage rotateImageByDegrees(AdvancedImage img, double angle) {
         angle = -angle;
         double rads = Math.toRadians(angle);
@@ -160,18 +230,48 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         return i;
     }
 
+    /**
+     * replaces the given color by a new one
+     * !!this is highly inefficient for large images!!
+     * @param oldColor the color which shall be replaced
+     * @param newColor the color it gets replaced with
+     * @return an image with the replaced colors
+     */
     public AdvancedImage replaceColor(Color oldColor, Color newColor) {
         return replaceColor(this, oldColor, newColor);
     }
 
+    /**
+     * replaces the given color by a new one
+     * !!this is highly inefficient for large images!!
+     * @param oldColor the color which shall be replaced
+     * @param newColor the color it gets replaced with
+     * @return an image with the replaced colors
+     */
     public AdvancedImage replaceColor(int oldColor, int newColor) {
         return replaceColor(this, oldColor, newColor);
     }
 
+    /**
+     * replaces the given color by a new one
+     * !!this is highly inefficient for large images!!
+     * @param image the image the color replacement gets done for
+     * @param target the color which shall be replaced
+     * @param preferred the color it gets replaced with
+     * @return an image with the replaced colors
+     */
     public static AdvancedImage replaceColor(AdvancedImage image, Color target, Color preferred) {
         return replaceColor(image, target.getRGB(), preferred.getRGB());
     }
 
+    /**
+     * replaces the given color by a new one
+     * !!this is highly inefficient for large images!!
+     * @param image the image the color replacement gets done for
+     * @param target the color which shall be replaced
+     * @param preferred the color it gets replaced with
+     * @return an image with the replaced colors
+     */
     public static AdvancedImage replaceColor(AdvancedImage image, int target, int preferred) {
         int width = image.getWidth();
         int height = image.getHeight();
@@ -193,17 +293,37 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         return newImage;
     }
 
+    /**
+     * fills the image with the given color
+     * @param clr the color this image gets filled with
+     */
     public void fill(Color clr) {
         drawRect(0,0, getWidth(), getHeight(), clr);
     }
 
+    /**
+     * draws a rectangle onto this image
+     * @param x x position of the rectangle
+     * @param y y position of the rectangle
+     * @param width width of the rectangle
+     * @param height height of the rectangle
+     * @param clr the color which should be used
+     */
     public void drawRect(int x, int y, int width, int height, Color clr) {
         Graphics2D g = createGraphics();
         g.setColor(clr);
-        g.drawRect(x,y, width, height);
+        g.fillRect(x,y, width, height);
         g.dispose();
     }
 
+    /**m
+     *  draws an oval onto the image
+     * @param x x position of the center
+     * @param y y position of the center
+     * @param width width of the oval
+     * @param height height of the oval
+     * @param clr color of the oval
+     */
     public void drawOval(int x, int y, int width, int height, Color clr) {
         Graphics2D g = createGraphics();
         g.setColor(clr);
@@ -211,10 +331,28 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         g.dispose();
     }
 
+    /**
+     * draws a string onto the image
+     * @param color color of the text
+     * @param font font of the text
+     * @param text the text which gets drawn
+     * @param x x position of the center
+     * @param y y position of the center
+     */
     public void drawText(Color color, Font font, String text, int x, int y) {
         drawText(color, font, text, x, y, VerticalAlignment.CENTER, HorizontalAlignment.CENTER);
     }
 
+    /**
+     * draws a string onto the image
+     * @param color color of the text
+     * @param font font of the text
+     * @param text the text which gets drawn
+     * @param x x position of the center
+     * @param y y position of the center
+     * @param verticalAlignment vertical alignment of the text
+     * @param horizontalAlignment horizontal alignment of the text
+     */
     public void drawText(Color color, Font font, String text, int x, int y, VerticalAlignment verticalAlignment, HorizontalAlignment horizontalAlignment)
     {
         Graphics2D graphics = createGraphics();
@@ -268,6 +406,10 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
 
     public void drawText(Color color, Font font, String text) {
         drawText(color, font, text, getWidth()/2, getHeight()/2);
+    }
+
+    public int[] getDimension() {
+        return new int[] {getWidth(), getHeight()};
     }
 
     public enum ImagePosition {
