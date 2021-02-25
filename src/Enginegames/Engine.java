@@ -1,6 +1,7 @@
 package Enginegames;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public class Engine {
@@ -8,14 +9,14 @@ public class Engine {
     public long ttime, tick, latestMspt;
     public double tps;
     public boolean started, terminateOnError;
-    public List<Tickable> tickables;
+    public Collection<Tickable> tickables;
 
     /**
      * Creates a new Enginegames.Engine to help with ticking
      * @param tps amount of ticks per second
      */
     public Engine(double tps) {
-        tickables = new ArrayList<>();
+        tickables = new CopyOnWriteArrayList<>();
         this.tps = tps;
         ttime = System.currentTimeMillis();
         start();
@@ -118,7 +119,7 @@ public class Engine {
      * @param <T> the class t has to implement the tickable interface
      */
     public <T extends Tickable> void removeObjects(Class<T> cls) {
-        tickables = tickables.stream().filter(t -> !cls.isInstance(t)).collect(Collectors.toList());
+        tickables = tickables.stream().filter(t -> !cls.isInstance(t)).collect(Collectors.toCollection(CopyOnWriteArrayList::new));
     }
 
     /**

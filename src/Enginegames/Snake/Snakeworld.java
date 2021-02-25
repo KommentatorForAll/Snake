@@ -1,32 +1,40 @@
 package Enginegames.Snake;
 
 import Enginegames.*;
+import Enginegames.Button;
+
+import java.awt.*;
+import java.util.HashMap;
 
 public class Snakeworld extends World {
 
     public int t = 0;
     public boolean started = false, running = false, wasDead, endless=true;
     public Head head;
-    public double sizingBorder = .75;
+    public Tag stats;
+    public double sizingBorder = .1;
+    public static HashMap<String, Font> fonts = Utils.loadAllFonts();
 
     public Snakeworld() {
         super(10, 10, 64);
-        Enginegames.Main.enableDebug = true;
-        Button b = new Label();
-        addObject(b, 1,1);
+        Enginegames.Main.enableDebug = false;
+        stats = Filework.readScores();
+        stats.print();
         setTps(8);
         setPaintOrder(Head.class, Tile.class, Apple.class, Button.class);
         setBackground(Utils.loadImageFromAssets("background_tile"));
         //setBackground(Utils.loadImageFromAssets("invis"));
         //setBackground(null);
         setBackgroundOption(WorldUI.ImageOption.TILED);
-        setBackgroundOpaqueness(0.125);
+        setBackgroundOpaqueness(1);
     }
 
     public void showDeathscreen() {
         System.out.println("you died");
+
         wasDead = true;
         removeAll();
+        switchWorld(new Deathscreen(stats, head.size-2, "endless", "player1", this));
         //setBackground(null);
         //stop();
     }

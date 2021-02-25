@@ -8,8 +8,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class Utils {
+
+    public static String assets = System.getProperty("user.dir")+"/assets/";
 
     /**
      * loads an image from anywhere on your pc.
@@ -35,7 +38,7 @@ public class Utils {
      * @return the loaded image !!may be null if no image was found!!
      */
     public static AdvancedImage loadImageFromAssets(String filename) {
-        return loadImage(System.getProperty("user.dir")+"/assets/" +filename);
+        return loadImage(assets+"sprites/" +filename);
     }
 
     /**
@@ -69,4 +72,82 @@ public class Utils {
     public <T> int pain(ArrayList<T> T) {
         return Integer.MAX_VALUE;
     }
+
+    /**
+     * fetches the OS the game is run on
+     * @return the OS currently booted
+     */
+    public static String getOS() {
+        String os = System.getProperty("os.name");
+        System.out.println(os);
+        if (os.contains("Windows")) return "windows";
+        if (os.contains("Mac")) return "mac";
+        if (os.contains("Linux")) return "linux";
+        return os;
+    }
+
+    public static String fetchAppdataFolder() {
+        return fetchAppdataFolder(getOS());
+    }
+
+    /**
+     * Fetches the appdata folder from the given os
+     * @param os the operating system, the program is running on
+     * @return the path for appdata
+     */
+    public static String fetchAppdataFolder(String os) {
+        String dir = System.getenv("APPDATA");
+        if (dir != null)
+            return dir+"/";
+        switch (os) {
+            case "mac":
+                return " ~/Library/Application Support/";//"bad os, we don't support such crap";
+            case "linux":
+                return "~/.config/";
+            default:
+                return "./";
+        }
+    }
+
+    public static Font loadFontFromAssets(String name) {
+        // Creates an awt font from the file as true type font (.ttf)
+        Font font = null;
+        try {
+            font = Font.createFont(Font.TRUETYPE_FONT, new File(assets+"fonts/"+name));
+            //generates an graphics environment for idk what, not my script, but scisneromams i'm just commenting this crap
+            GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            //registers the font in the graphics environment
+            graphicsEnvironment.registerFont(font);
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+        }
+        return font;
+    }
+
+    /**
+     * Loads all fonts from the assets folder as java.awt.Font
+     * This is needed as Greenfoot sucks and one requies a huge script using awt fonts to center some text
+     * @return an hashmap of fonts as name -> font
+     */
+    public static HashMap<String, Font> loadAllFonts() {
+        HashMap<String, java.awt.Font> fonts = new HashMap<>();
+        File dir = new File(assets+"fonts/");
+        File[] dirFiles = dir.listFiles();
+        String name;
+        if (dirFiles != null) {
+            for (File child : dirFiles) {
+                name = child.getName();
+                if (!name.endsWith(".ttf")) continue;
+                try {
+                    fonts.put(name.replaceAll("\\.\\w+$", ""), loadFontFromAssets(name));
+                }
+                catch (Exception e) {
+                    System.err.println("Error while loading font {}".replace("{}", name));
+                    e.printStackTrace();
+                }
+            }
+        }
+        return fonts;
+    }
+
 }

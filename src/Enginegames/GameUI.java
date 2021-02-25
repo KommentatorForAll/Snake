@@ -13,6 +13,8 @@ public class GameUI extends JFrame {
     public boolean adContaminated;
     public GraphicsDevice[] monitors = getMonitors();
 
+    public int[] bardim;
+    public World world;
 
     public GameUI(String name, World world) {
         this(name, world.ui);
@@ -23,7 +25,7 @@ public class GameUI extends JFrame {
     }
 
     public GameUI(String name, World world, boolean adContaminated) {
-        this(name, world.ui, adContaminated, null, null);
+        this(name, world.ui, adContaminated, world, world);
     }
 
     public GameUI(String name, JPanel worldUI, boolean adContaminated, KeyListener kl, MouseListener ml) {
@@ -37,21 +39,57 @@ public class GameUI extends JFrame {
             x += 600;
             y += 200;
         }
-        addKeyListener(kl);
-        addMouseListener(ml);
+//        addKeyListener(kl);
+//        addMouseListener(ml);
         setVisible(true);
 
-        int[] bardim = getBorderDims();
+        bardim = getBorderDims();
         if (Main.enableDebug)
             System.out.println("Bar dimension: "+Arrays.toString(bardim));
-        Dimension d = new Dimension(x+bardim[0], y+bardim[1]);
-        setSize(d);
-        setMinimumSize(d);
         int[] mpos = getLastMonitorPosition();
         setLocation(mpos[0],mpos[1]);
+//        worldUI.setLocation(x/2-worldUI.getWidth()/2-bardim[0], y/2-worldUI.getHeight()/2-bardim[1]);
+//        add(worldUI);//, BorderLayout.CENTER);
+        this.adContaminated = adContaminated;
+
+//        addComponentListener(new ComponentAdapter()
+//        {
+//            public void componentResized(ComponentEvent evt) {
+//                int x = getWidth(), y = getHeight();
+//                worldUI.setLocation(x/2-worldUI.getWidth()/2-(bardim[0]/2), y/2-worldUI.getHeight()/2-(bardim[1]/2));
+//            }
+//        });
+        switchWorld((World) kl);
+    }
+
+    public void switchWorld(World world) {
+        System.out.println("switching world..");
+        if (Main.enableDebug) {
+            System.out.println("Old world: " + this.world);
+            System.out.println("Switching to: " + world);
+        }
+
+        World.mainframe = this;
+        WorldUI worldUI = world.ui;
+        removeMouseListener(this.world);
+        removeKeyListener(this.world);
+        if (this.world != null)
+            remove(this.world.ui);
+        addKeyListener(world);
+        addMouseListener(world);
+        this.world = world;
+        int x = worldUI.getWidth(), y = worldUI.getHeight();
+        if (adContaminated) {
+            x += 600;
+            y += 200;
+        }
+        Dimension d = new Dimension(x+bardim[0], y+bardim[1]);
+        System.out.println(d);
+        setMinimumSize(d);
+        setSize(d);
         worldUI.setLocation(x/2-worldUI.getWidth()/2-bardim[0], y/2-worldUI.getHeight()/2-bardim[1]);
         add(worldUI);//, BorderLayout.CENTER);
-        this.adContaminated = adContaminated;
+
 
         addComponentListener(new ComponentAdapter()
         {
@@ -60,6 +98,7 @@ public class GameUI extends JFrame {
                 worldUI.setLocation(x/2-worldUI.getWidth()/2-(bardim[0]/2), y/2-worldUI.getHeight()/2-(bardim[1]/2));
             }
         });
+
     }
 
     /**
@@ -70,6 +109,7 @@ public class GameUI extends JFrame {
         GraphicsEnvironment g = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice[] devices = g.getScreenDevices();
 
+        if (Main.enableDebug)
         for (GraphicsDevice device : devices) {
             System.out.println("Width:" + device.getDisplayMode().getWidth());
             System.out.println("Height:" + device.getDisplayMode().getHeight());

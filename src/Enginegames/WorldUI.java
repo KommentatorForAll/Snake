@@ -50,7 +50,7 @@ public class WorldUI extends JPanel {
      * paints the given objects
      * @param objects the objects to be pain(ted)
      */
-    public void paint(ArrayList<WorldObj> objects) {
+    public void paint(Collection<WorldObj> objects) {
         objs = new ArrayList<>();
         objs.addAll(objects);
         repaint();

@@ -6,7 +6,7 @@ package Enginegames;
 public interface Tickable {
 
     /**
-     * the super mehode, for ticking. this is the one being called every tick.
+     * the super methode, for ticking. this is the one being called every tick.
      * should be final and call the tick() method. This is a way to call functions in super classes without having to be manually called in the objects
      */
     void _tick();

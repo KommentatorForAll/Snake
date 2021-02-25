@@ -1,5 +1,6 @@
 package Enginegames;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -9,18 +10,20 @@ import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 public abstract class World implements Tickable, KeyListener, MouseListener {
 
     public int pixelSize;
     public int width, height;
-    public ArrayList<WorldObj> objects, toRemove = new ArrayList<>(), toAdd = new ArrayList<>();
+    public Collection<WorldObj> objects;
     public Queue<KeyEventInfo> keys = new ConcurrentLinkedQueue<>();
     public Queue<MouseEventInfo> clicks = new ConcurrentLinkedQueue<>();
     public static Engine e = new Engine(20);
     public boolean hardEdge;
     public WorldUI ui;
+    public static GameUI mainframe;
     public Random random;
     public boolean enableDebug = false;
     private int sw, sh;
@@ -45,7 +48,7 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
         this.pixelSize = pixelSize;
         updateSW();
         random = new Random();
-        objects = new ArrayList<>();
+        objects = new CopyOnWriteArrayList<>();
         ui = new WorldUI(pixelSize*width, pixelSize*height, WorldUI.ImageOption.NONE, pixelSize, this);
         start();
     }
@@ -112,10 +115,6 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
         handleKeys();
         handleMouse();
         objects.forEach(WorldObj::_tick);
-        objects.removeAll(toRemove);
-        objects.addAll(toAdd);
-        toRemove.clear();
-        toAdd.clear();
         ui.paint(objects);
     }
 
@@ -131,7 +130,7 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
      * @param y the y position of the object
      */
     public final void addObject(WorldObj obj, int x, int y) {
-        toAdd.add(obj);
+        objects.add(obj);
         obj.setLocation(x,y);
         obj.world = this;
     }
@@ -141,7 +140,7 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
      * @param obj the object to remove
      */
     public final void removeObject(WorldObj obj) {
-        toRemove.add(obj);
+        objects.remove(obj);
         obj.world = null;
     }
 
@@ -191,6 +190,11 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
     public static void switchWorld(World world) {
         e.removeObjects(World.class);
         e.addObject(world);
+        switchFocus(world);
+    }
+
+    public static void switchFocus(World world) {
+        mainframe.switchWorld(world);
     }
 
     /**
@@ -356,15 +360,15 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
     public void handleMouse() {
         MouseEventInfo e;
         Point p, uiLocation = ui.getLocation();
-        int[] absPos, relativePos;
+        //int[] aabsPos, relativePos;
         WorldObj o;
         List<WorldObj> objs;
         while ((e = clicks.poll()) != null)
         {
             p = e.e.getPoint();
-            absPos = new int[] {p.x-uiLocation.x, p.y - uiLocation.y};
-            relativePos = new int[] {absPos[0]/pixelSize, absPos[1]/pixelSize};
-            objs = objectsAt(relativePos[0], relativePos[1], WorldObj.class);
+            int[] absPos = new int[] {p.x-uiLocation.x, p.y - uiLocation.y};
+            int[] relativePos = new int[] {absPos[0]/pixelSize, absPos[1]/pixelSize};
+            objs = objects.stream().filter(ob -> ob.isAt(absPos[0], absPos[1], true)).collect(Collectors.toList());
             o = objs.isEmpty()? null : objs.get(0);
             MouseEventInfo finalE = e;
             switch (e.type) {
@@ -395,6 +399,14 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
     @SafeVarargs
     public final void setPaintOrder(Class<? extends WorldObj> ... classes) {
         ui.setPaintOrder(classes);
+    }
+
+    public final Point getOffset() {
+        Point p = ui.getLocation();
+        int[] bardim = mainframe.bardim;
+        p.x += bardim[0];
+        p.y += bardim[1];
+        return p;
     }
 
     private static class KeyEventInfo {

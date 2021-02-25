@@ -135,7 +135,7 @@ public abstract class WorldObj implements Tickable {
         switch (img.imgpos) {
             case CENTER:
                 int[] tmp = new int[] {ret[1][0]/2, ret[1][1]/2};
-                ret[0] = tmp;
+                ret[0] = new int[] {-tmp[0], -tmp[1]};
                 ret[1] = tmp;
         }
         return ret;
@@ -146,9 +146,10 @@ public abstract class WorldObj implements Tickable {
     public final Rectangle getShape() {
         int[][] dim = getDimension();
         int[] size = img.getDimension();
+        Point offset = world.getOffset();
         switch(img.imgpos) {
             case CENTER:
-                return new Rectangle(dim[0][0]+this.x, dim[0][1] + this.y, size[0], size[1]);
+                return new Rectangle(dim[0][0] + (this.x*world.pixelSize)+world.pixelSize/2+offset.x, dim[0][1] + (this.y*world.pixelSize)+world.pixelSize/2+offset.y, size[0], size[1]);
 
             case TOP_LEFT:
                 return new Rectangle(x, y, size[0], size[1]);
@@ -175,6 +176,9 @@ public abstract class WorldObj implements Tickable {
      */
     public final boolean isAt(int x, int y, boolean absolute) {
         Shape me = getShape();
+        System.out.println(me);
+        System.out.println(x+ " "+ y);
+        System.out.println(me.contains(x,y));
         if (absolute) {
             return me.contains(x,y);
         }
