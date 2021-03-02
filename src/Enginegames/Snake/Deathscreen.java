@@ -5,12 +5,14 @@ import Enginegames.Button;
 import Enginegames.Label;
 
 import java.awt.*;
+import java.awt.event.WindowEvent;
 
 public class Deathscreen extends World {
 
     public static Color transparent = new Color(0,0,0,0);
 
     public World origin;
+    public static Tag stats;
 
     public Deathscreen(Tag stats, int score, String gamename, String playername, World origin) {
         super(10,10,100);
@@ -20,6 +22,7 @@ public class Deathscreen extends World {
         yd.setTextColor(Color.RED);
         yd.setBackgroundColor(transparent);
         yd.setBorderColor(transparent);
+        Deathscreen.stats = stats;
         addObject(yd, 5,2);
         AdvancedImage img = new AdvancedImage(1000,1000);
         img.fill(Color.BLACK);
@@ -37,8 +40,7 @@ public class Deathscreen extends World {
         Label avgscore = new Label("Average score: " + Filework.getAvgscore(stats, gamename));
         addObject(avgscore, 5,5);
         //switchWorld(this);
-
-        addObject(new Button() {
+        Button b = new Button() {
 
             @Override
             public void tick() {
@@ -46,10 +48,44 @@ public class Deathscreen extends World {
             }
 
             @Override
-            public void clickEvent() {
+            public void clickEvent(MouseEventInfo e) {
                 World.switchWorld(((Deathscreen) world).origin);
             }
-        }, 2, 7);
+        };
+        b.setText("Retry");
+        b.setSize(200,100);
+        addObject(b, 2,7);
+        b = new Button() {
+            @Override
+            public void clickEvent(MouseEventInfo e) {
+                World.switchWorld(new Settingsscreen());
+            }
+
+            @Override
+            public void tick() {
+
+            }
+        };
+        b.setText("Back to settings");
+        b.setSize(200, 100);
+        addObject(b,5,7 );
+
+        b = new Button() {
+            @Override
+            public void clickEvent(MouseEventInfo e) {
+                Filework.writeScores(stats);
+                world.mainframe.dispose();
+            }
+
+            @Override
+            public void tick() {
+
+            }
+        };
+        b.setText("Exit");
+        b.setSize(200,100);
+        addObject(b, 7, 7);
+
     }
 
     @Override
@@ -59,5 +95,9 @@ public class Deathscreen extends World {
 
     public void keyTyped(int key) {
         //switchWorld(origin);
+    }
+
+    public void windowClosed(WindowEvent e) {
+        Filework.writeScores(stats);
     }
 }

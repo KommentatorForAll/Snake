@@ -85,6 +85,10 @@ public abstract class WorldObj implements Tickable {
         img = new AdvancedImage(ImageIO.read(new File(name)));
     }
 
+    public void _mouseEvent(MouseEventInfo e) {
+        mouseEvent(e);
+    }
+
     /**
      * gets called, when one uses the mouse on the object
      * @param e the mouse event called
@@ -149,7 +153,7 @@ public abstract class WorldObj implements Tickable {
         Point offset = world.getOffset();
         switch(img.imgpos) {
             case CENTER:
-                return new Rectangle(dim[0][0] + (this.x*world.pixelSize)+world.pixelSize/2+offset.x, dim[0][1] + (this.y*world.pixelSize)+world.pixelSize/2+offset.y, size[0], size[1]);
+                return new Rectangle(dim[0][0] + (this.x*world.pixelSize)+offset.x, dim[0][1] + (this.y*world.pixelSize)+offset.y, size[0], size[1]);
 
             case TOP_LEFT:
                 return new Rectangle(x, y, size[0], size[1]);
@@ -176,9 +180,6 @@ public abstract class WorldObj implements Tickable {
      */
     public final boolean isAt(int x, int y, boolean absolute) {
         Shape me = getShape();
-        System.out.println(me);
-        System.out.println(x+ " "+ y);
-        System.out.println(me.contains(x,y));
         if (absolute) {
             return me.contains(x,y);
         }

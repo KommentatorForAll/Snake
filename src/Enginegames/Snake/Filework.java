@@ -14,14 +14,18 @@ public class Filework {
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Creating new saves, as none existed");
-            return createDefaultSave();
+            Tag t = createDefaultSave();
+            writeScores(t);
+            return t;
         }
     }
 
     public static void writeScores(Tag t) {
         try {
             System.out.println(sfl+"scores.nbt");
-            FileOutputStream fos = new FileOutputStream(sfl+"scores.nbt");
+            File f = new File(sfl+"scores.nbt");
+            f.getParentFile().mkdirs();
+            FileOutputStream fos = new FileOutputStream(f);
             t.writeTo(fos);
             fos.close();
 

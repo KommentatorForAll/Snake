@@ -37,6 +37,14 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         drawImage(img);
     }
 
+    public void draw(String s, Color color, Font font) {
+        drawText(color, font, s);
+    }
+
+    public void draw(AdvancedImage img) {
+        drawImage(img);
+    }
+
     /**
      * draws a BufferedImage onto this image.
      * @param img
@@ -382,7 +390,7 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         {
             y -= (height * (lines.length / 2));
         }
-        if (verticalAlignment == VerticalAlignment.BOTTOM)
+        else if (verticalAlignment == VerticalAlignment.BOTTOM)
         {
             y -= height * lines.length;
         }
@@ -394,7 +402,7 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
             {
                 modX = x - (fontMetrics.stringWidth(lines[i]) / 2);
             }
-            if(horizontalAlignment == HorizontalAlignment.RIGHT)
+            else if(horizontalAlignment == HorizontalAlignment.RIGHT)
             {
                 modX = x - fontMetrics.stringWidth(lines[i]);
             }

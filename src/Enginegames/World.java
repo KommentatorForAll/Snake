@@ -2,10 +2,7 @@ package Enginegames;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
@@ -13,7 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-public abstract class World implements Tickable, KeyListener, MouseListener {
+public abstract class World implements Tickable, KeyListener, MouseListener, WindowListener {
 
     public int pixelSize;
     public int width, height;
@@ -43,6 +40,7 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
      * @param pixelSize the size of each field.
      */
     public World(int width, int height, int pixelSize) {
+        if(width <= 0 || height <= 0 || pixelSize <= 0) throw new IllegalArgumentException("Size must not be less or equal 0");
         this.width = width;
         this.height = height;
         this.pixelSize = pixelSize;
@@ -68,6 +66,7 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
      * @param height new height of the world
      */
     public final void resizeField(int width, int height) {
+        if(width <= 0 || height <= 0 || pixelSize <= 0) throw new IllegalArgumentException("Size must not be less or equal 0");
         this.width = width;
         this.height = height;
         updateSW();
@@ -79,6 +78,7 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
      * @param pixelSize the size of each field
      */
     public final void resizeField(int pixelSize) {
+        if(width <= 0 || height <= 0 || pixelSize <= 0) throw new IllegalArgumentException("Size must not be less or equal 0");
         this.pixelSize = pixelSize;
         ui.pxsize = pixelSize;
         updateSW();
@@ -98,6 +98,7 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
      *updates the oveerall size of the world.
      */
     public final void updateSize() {
+        if(width <= 0 || height <= 0 || pixelSize <= 0) throw new IllegalArgumentException("Size must not be less or equal 0");
         ui.setSize(width*pixelSize, height*pixelSize);
         ui.repaint();
     }
@@ -165,7 +166,8 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
      * sets the ticks per second to the given value
      * @param tps the tps which are gonna be run
      */
-    public final void setTps(double tps) {
+    public static void setTps(double tps) {
+        if (tps <= 0) throw new IllegalArgumentException("Tps must not be less or equal 0");
         e.tps = tps;
     }
 
@@ -279,6 +281,8 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
                 case 1:
                     keyPressed(e.e.getKeyChar());
                     keyPressed((int)e.e.getKeyChar());
+                    KeyEventInfo finalE = e;
+                    objectsOf(Textfield.class).stream().filter(tf -> tf.isSelected).forEach(tf -> tf.keyTyped(finalE.e.getKeyChar()));
                     break;
                 case 2:
                     keyReleased(e.e.getKeyChar());
@@ -387,7 +391,7 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
                 case MouseEventInfo.MOUSE_EXITED:
                     mouseExited(e.e, o);
             }
-            objs.forEach(ob -> ob.mouseEvent(finalE));
+            objs.forEach(ob -> ob._mouseEvent(finalE));
         }
     }
 
@@ -401,11 +405,15 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
         ui.setPaintOrder(classes);
     }
 
+    /**
+     * returns the offset, due to the bar at the top of a jframe
+     * @return the offset (to add to the point you are looking for) as a Point
+     */
     public final Point getOffset() {
         Point p = ui.getLocation();
         int[] bardim = mainframe.bardim;
-        p.x += bardim[0];
-        p.y += bardim[1];
+        p.x += bardim[0]+(pixelSize/2);
+        p.y += bardim[1]+(pixelSize/2);
         return p;
     }
 
@@ -418,11 +426,46 @@ public abstract class World implements Tickable, KeyListener, MouseListener {
         }
     }
 
+    /**
+     * sets the background opaqueness of the world. a value less than 1 results in a fading of the drawn images
+     * @param opaque opaqueness to set to
+     * @throws IllegalArgumentException if the opaquness is not between (inclusive) 0 and 1
+     */
     public final void setBackgroundOpaqueness(double opaque) {
+        if (!((0<= opaque) && (opaque <= 1))) throw new IllegalArgumentException("Opaqueness has to be between 0 and 1");
         ui.setBackgroundOpaqueness(opaque);
     }
 
     public String toString() {
         return this.getClass().getSimpleName();
     }
+
+    /**
+     * called as a WindowListener, can be implemented for initial or final actions
+     */
+    public void windowOpened(WindowEvent e) {}
+    /**
+     * called as a WindowListener, can be implemented for initial or final actions
+     */
+    public void windowClosed(WindowEvent e) {}
+    /**
+     * called as a WindowListener, can be implemented for initial or final actions
+     */
+    public void windowClosing(WindowEvent e) {}
+    /**
+     * called as a WindowListener, can be implemented for initial or final actions
+     */
+    public void windowIconified(WindowEvent e) {}
+    /**
+     * called as a WindowListener, can be implemented for initial or final actions
+     */
+    public void windowDeiconified(WindowEvent e) {}
+    /**
+     * called as a WindowListener, can be implemented for initial or final actions
+     */
+    public void windowActivated(WindowEvent e) {}
+    /**
+     * called as a WindowListener, can be implemented for initial or final actions
+     */
+    public void windowDeactivated(WindowEvent e) {}
 }

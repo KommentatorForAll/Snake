@@ -16,5 +16,5 @@ public class Label extends Button{
 
     public void tick() {}
 
-    public void clickEvent() {}
+    public void clickEvent(MouseEventInfo e) {}
 }

@@ -1,5 +1,8 @@
 package Enginegames;
 
+import Enginegames.Snake.Deathscreen;
+import Enginegames.Snake.Filework;
+import Enginegames.Snake.Settingsscreen;
 import Enginegames.Snake.Snakeworld;
 
 public class Main {
@@ -14,7 +17,9 @@ public class Main {
     }
 
     public Main(boolean isAdContaminated) {
-        world = new Snakeworld();
+        World.setTps(8);
+        world = new Settingsscreen();
+        Deathscreen.stats = Filework.readScores();
         window = new GameUI("Snake", world, isAdContaminated);
         window.setIconImage(Utils.loadImageFromAssets("title"));
         window.setVisible(true);

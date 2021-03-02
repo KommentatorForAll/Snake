@@ -10,7 +10,7 @@ public class Head extends Enginegames.Snake.Tile {
 
     public int size, lastdir;
     public boolean changedDir = false;
-    AdvancedImage commonImage = AdvancedImage.rotateImageByDegrees(Utils.loadImageFromAssets("snake_head"), 90);
+    public static AdvancedImage commonImage = AdvancedImage.rotateImageByDegrees(Utils.loadImageFromAssets("snake_head"), 90);
 
 
     public Head(World world, int x, int y) {
@@ -21,9 +21,9 @@ public class Head extends Enginegames.Snake.Tile {
         world.addObject(this, x, y);
         commonImage.imgs = AdvancedImage.ImageSizing.STRETCH;
         setImage(commonImage);
-        Tile mid = new Tile(this, 0,1), tail = new Tile(this,0, 2);
-        world.addObject(mid, x, y-1);
-        world.addObject(tail, x, y-2);
+        //Tile mid = new Tile(this, 0,1), tail = new Tile(this,0, 2);
+        //world.addObject(mid, x, y-1);
+        //world.addObject(tail, x, y-2);
         Apple.generate(world);
         dir = 2;
         lastdir = dir;
@@ -65,8 +65,9 @@ public class Head extends Enginegames.Snake.Tile {
             world.removeObject(world.objectsOf(Apple.class).get(0));
             Apple.generate(world);
             Snakeworld world = (Snakeworld) this.world;
+            if (world.sizingBorder == 0) return;
             if (size >= world.sizingBorder*(world.width*world.height)) {
-                world.resizeField(1.1);
+                world.resizeField(world.increase_amount);
             }
         }
     }
