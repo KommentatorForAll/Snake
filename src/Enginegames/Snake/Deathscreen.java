@@ -2,6 +2,7 @@ package Enginegames.Snake;
 
 import Enginegames.*;
 import Enginegames.Button;
+import Enginegames.Dialog;
 import Enginegames.Label;
 
 import java.awt.*;
@@ -12,9 +13,9 @@ public class Deathscreen extends World {
     public static Color transparent = new Color(0,0,0,0);
 
     public World origin;
-    public static Tag stats;
+    public static Tag stats = Filework.readScores();
 
-    public Deathscreen(Tag stats, int score, String gamename, String playername, World origin) {
+    public Deathscreen(Tag stats, int score, String gamename, World origin) {
         super(10,10,100);
         this.origin = origin;
         Label yd = new Label("YOU DIED");
@@ -28,10 +29,13 @@ public class Deathscreen extends World {
         img.fill(Color.BLACK);
         setBackground(img);
         setBackgroundOption(WorldUI.ImageOption.STRETCHED);
-        boolean ishighscore = Filework.checkHighscore(stats, gamename, score, playername);
-        Label nhs = new Label("Highscore: "+ Filework.getHighscore(stats, gamename));
+        boolean ishighscore = Filework.checkHighscore(stats, gamename, score);
+        String oldHSH = (String) stats.findNextTag(gamename).get("playername");
+        Label nhs = new Label("Highscore\n"+ oldHSH + ": "+Filework.getHighscore(stats, gamename));
         if (ishighscore) {
+            String tmp = Dialog.askString("Your name", oldHSH);
             nhs.setText("New Highscore!");
+            Filework.setHighscore(score, stats, gamename, tmp);
         }
         addObject(nhs, 5, 4);
         Label ys = new Label("Your score: "+ score);
@@ -85,7 +89,7 @@ public class Deathscreen extends World {
         b.setText("Exit");
         b.setSize(200,100);
         addObject(b, 7, 7);
-
+        Filework.writeScores(stats);
     }
 
     @Override
@@ -98,6 +102,7 @@ public class Deathscreen extends World {
     }
 
     public void windowClosed(WindowEvent e) {
+        System.out.println("saving stats");
         Filework.writeScores(stats);
     }
 }

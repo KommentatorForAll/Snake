@@ -10,7 +10,7 @@ public class Head extends Enginegames.Snake.Tile {
 
     public int size, lastdir;
     public boolean changedDir = false;
-    public static AdvancedImage commonImage = AdvancedImage.rotateImageByDegrees(Utils.loadImageFromAssets("snake_head"), 90);
+    public static AdvancedImage commonImage ;//= AdvancedImage.rotateImageByDegrees(Utils.loadImageFromAssets("head/snake_head"), 90);
 
 
     public Head(World world, int x, int y) {
@@ -30,7 +30,9 @@ public class Head extends Enginegames.Snake.Tile {
     }
 
     public void tick() {
+        if (!((Snakeworld) world).running) return;
         checkDeath();
+        if (world == null) return;
         appleHandling();
         changedDir = false;
         int dx = 0, dy = 0;

@@ -13,7 +13,7 @@ public class GameUI extends JFrame {
     public boolean adContaminated;
     public GraphicsDevice[] monitors = getMonitors();
 
-    public int[] bardim;
+    public int[] bardim, mpos;
     public World world;
 
     public GameUI(String name, World world) {
@@ -46,8 +46,6 @@ public class GameUI extends JFrame {
         bardim = getBorderDims();
         if (Main.enableDebug)
             System.out.println("Bar dimension: "+Arrays.toString(bardim));
-        int[] mpos = getLastMonitorPosition();
-        setLocation(mpos[0],mpos[1]);
 //        worldUI.setLocation(x/2-worldUI.getWidth()/2-bardim[0], y/2-worldUI.getHeight()/2-bardim[1]);
 //        add(worldUI);//, BorderLayout.CENTER);
         this.adContaminated = adContaminated;
@@ -60,6 +58,8 @@ public class GameUI extends JFrame {
 //            }
 //        });
         switchWorld((World) kl);
+        mpos = getLastMonitorPosition();
+        setLocation(mpos[0]-worldUI.getWidth()/2,mpos[1]-worldUI.getHeight()/2);
     }
 
     public void switchWorld(World world) {
@@ -77,6 +77,7 @@ public class GameUI extends JFrame {
             remove(this.world.ui);
         addKeyListener(world);
         addMouseListener(world);
+        addWindowListener(world);
         this.world = world;
         int x = worldUI.getWidth(), y = worldUI.getHeight();
         if (adContaminated) {
@@ -96,6 +97,7 @@ public class GameUI extends JFrame {
             public void componentResized(ComponentEvent evt) {
                 int x = getWidth(), y = getHeight();
                 worldUI.setLocation(x/2-worldUI.getWidth()/2-(bardim[0]/2), y/2-worldUI.getHeight()/2-(bardim[1]/2));
+                setLocation(mpos[0]-worldUI.getWidth()/2,mpos[1]-worldUI.getHeight()/2);
             }
         });
 
@@ -122,11 +124,13 @@ public class GameUI extends JFrame {
      * @return the positio the last mointor starts at.
      */
     public int[] getLastMonitorPosition() {
-        int x = 100;
-        int y = 100;
+        int x = 0;
+        int y = 0;
         for (int i = 0; i < monitors.length-1; i++) {
             x += monitors[i].getDisplayMode().getWidth();
         }
+        x+= monitors[monitors.length-1].getDisplayMode().getWidth()/2;
+        y+= monitors[monitors.length-1].getDisplayMode().getHeight()/2;
         return new int[] {x,y};
     }
 

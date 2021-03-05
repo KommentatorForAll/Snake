@@ -9,15 +9,22 @@ import java.awt.event.WindowEvent;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Settingsscreen extends World {
 
-    Textfield startsize, width, height, pxsize, tps;
-    ScrollButton primaryColor, secondaryColor, tertiaryColor, gamemode;
-    Label pcl, scl, tcl, gml, szl, wl, hl, pxl, tpsl, title;
-    Button start, exit;
+    public Textfield startsize, width, height, pxsize, tps;
+    public ScrollButton primaryColor, secondaryColor, tertiaryColor, gamemode;
+    public Label pcl, scl, tcl, gml, szl, wl, hl, pxl, tpsl, title, ssal, sssl;
+    public Button start, exit, swp, nRndColors, skinSetApple, skinSetSnake;
+    public static boolean skin, usrInputtedColor;
+    public List<AdvancedImage> clrs = colorOptions();
+    public static Color primary, secondary, tertiary;
+    public int ssai, sssi;
+
+    public static HashMap<String, HashMap<String, AdvancedImage>> sprites = Filework.loadAllSprites();
 
     public Settingsscreen() {
         super(10,15,64);
@@ -25,8 +32,123 @@ public class Settingsscreen extends World {
         img.fill(Color.BLACK);
         setBackground(img);
         setBackgroundOption(WorldUI.ImageOption.STRETCHED);
-        List<AdvancedImage> clrs = colorOptions();
+        gameSkins();
+        gameSettings();
+        setTps(20);
+    }
 
+    @Override
+    public void tick() {
+
+    }
+
+    public void gameSettings() {
+        removeAll();
+        addCommon();
+        if (gamemode == null) {
+            List<String> gmimgs = Arrays.stream(Snakeworld.Gamemode.values).map(g -> g.name).map(String::toLowerCase).collect(Collectors.toList());
+            gamemode = new ScrollButton(gmimgs, gmimgs.stream().filter(g -> Snakeworld.g.name.equals(g)).findFirst().orElse("default")) {
+                public void clickEvent(MouseEventInfo e) {
+                    super.clickEvent(e);
+                    Settingsscreen s = (Settingsscreen) world;
+                    Snakeworld.Gamemode g = Snakeworld.Gamemode.from((String) selected);
+                    s.startsize.setText(g.start_size + "");
+                    s.width.setText(g.width + "");
+                    s.height.setText(g.height + "");
+                    s.pxsize.setText(g.pxsize + "");
+
+                    boolean x = g.name.equals("custom");
+                    s.startsize.enabled = x;
+                    s.width.enabled = x;
+                    s.height.enabled = x;
+                    s.pxsize.enabled = x;
+                }
+            };
+            gamemode.setSize(96, 32);
+
+            gml = new Label("Gamemode");
+            gml.setSize(96, 32);
+            gml.setTextColor(Color.WHITE);
+            gml.setBackgroundColor(Color.BLACK);
+
+            Snakeworld.Gamemode selected = Snakeworld.Gamemode.from((String) gamemode.getSelected());
+            System.out.println(selected);
+
+            startsize = new Textfield();
+            startsize.setText(selected.start_size + "");
+
+            szl = new Label("Startlength");
+            szl.setSize(96, 32);
+            szl.setTextColor(Color.WHITE);
+            szl.setBackgroundColor(Color.BLACK);
+
+            width = new Textfield();
+            width.setSize(96, 32);
+            width.setText(selected.width + "");
+
+            wl = new Label("width");
+            wl.setSize(96, 32);
+            wl.setTextColor(Color.WHITE);
+            wl.setBackgroundColor(Color.BLACK);
+
+            height = new Textfield();
+            height.setText("" + selected.height);
+
+            hl = new Label("height");
+            hl.setSize(96, 32);
+            hl.setTextColor(Color.WHITE);
+            hl.setBackgroundColor(Color.BLACK);
+
+            pxsize = new Textfield();
+            pxsize.setText("" + selected.pxsize);
+
+            pxl = new Label("pixel size");
+            pxl.setSize(96, 32);
+            pxl.setTextColor(Color.WHITE);
+            pxl.setBackgroundColor(Color.BLACK);
+
+            tps = new Textfield();
+            tps.setText((int) e.tps + "");
+
+            tpsl = new Label("Ticks per second");
+            tpsl.setBackgroundColor(Color.BLACK);
+            tpsl.setSize(150, 32);
+            tpsl.setTextColor(Color.WHITE);
+
+            if ("custom".equals(gamemode.selected)) {
+                width.setText(Snakeworld.g.width + "");
+                height.setText(Snakeworld.g.height + "");
+                pxsize.setText(Snakeworld.g.pxsize + "");
+                startsize.setText(Snakeworld.g.start_size + "");
+            }
+
+            startsize.maxsize = -1;
+            tps.enabled = true;
+        }
+        addObject(gamemode, 7, 3);
+        addObject(gml, 3, 3);
+        addObject(tpsl, 3, 8);
+        addObject(tps, 7, 8);
+        addObject(pxl, 3, 7);
+        addObject(pxsize, 7, 7);
+        addObject(hl, 3, 6);
+        addObject(height, 7, 6);
+        addObject(wl, 3, 5);
+        addObject(width, 7, 5);
+        addObject(szl, 3, 4);
+        addObject(startsize, 7, 4);
+        objectsOf(Textfield.class).forEach(tf -> {
+            tf.setSize(96, 32);
+            tf.setBorderColor(Color.WHITE);
+            tf.setSelectedBorderColor(Color.GREEN);
+            tf.enabled = false;
+            tf.isNumeric = true;
+            tf.maxsize = 2;
+        });
+        tps.enabled = true;
+    }
+
+    public void addCommon() {
         title = new Label("settings") {
             public void tick() {
                 setTextColor(new Color(clrs.get(random.nextInt(clrs.size())).getRGB(0,0)));
@@ -38,76 +160,7 @@ public class Settingsscreen extends World {
         title.setBackgroundHoverColor(Color.BLACK);
         addObject(title, 5,1);
 
-        List<String> gmimgs = Arrays.stream(Snakeworld.Gamemode.values).map(g -> g.name).map(String::toLowerCase).collect(Collectors.toList());
-        gamemode = new ScrollButton(gmimgs, gmimgs.stream().filter(g -> Snakeworld.g.name.equals(g)).findFirst().orElse("default")){
-            public void clickEvent(MouseEventInfo e) {
-                super.clickEvent(e);
-                Settingsscreen s = (Settingsscreen) world;
-                Snakeworld.Gamemode g = Snakeworld.Gamemode.from((String) selected);
-                s.startsize.setText(g.start_size+"");
-                s.width.setText(g.width+"");
-                s.height.setText(g.height+"");
-                s.pxsize.setText(g.pxsize+"");
 
-                boolean x = g.name.equals("custom");
-                s.startsize.enabled = x;
-                s.width.enabled = x;
-                s.height.enabled = x;
-                s.pxsize.enabled = x;
-            }
-        };
-        gamemode.setSize(96,32);
-        addObject(gamemode, 7,3);
-
-        gml = new Label("Gamemode");
-        gml.setSize(96,32);
-        gml.setTextColor(Color.WHITE);
-        gml.setBackgroundColor(Color.BLACK);
-        addObject(gml, 3,3);
-
-        Snakeworld.Gamemode selected = Snakeworld.Gamemode.from((String) gamemode.getSelected());
-        System.out.println(selected);
-
-        startsize = new Textfield();
-        startsize.setText(selected.start_size+"");
-        addObject(startsize, 7,4);
-
-        szl = new Label("Startlength");
-        szl.setSize(96,32);
-        szl.setTextColor(Color.WHITE);
-        szl.setBackgroundColor(Color.BLACK);
-        addObject(szl, 3,4);
-
-        width = new Textfield();
-        width.setSize(96,32);
-        width.setText(selected.width+"");
-        addObject(width, 7, 5);
-
-        wl = new Label("width");
-        wl.setSize(96,32);
-        wl.setTextColor(Color.WHITE);
-        wl.setBackgroundColor(Color.BLACK);
-        addObject(wl, 3,5);
-
-        height = new Textfield();
-        height.setText(""+selected.height);
-        addObject(height, 7, 6);
-
-        hl = new Label("height");
-        hl.setSize(96,32);
-        hl.setTextColor(Color.WHITE);
-        hl.setBackgroundColor(Color.BLACK);
-        addObject(hl, 3,6);
-
-        pxsize = new Textfield();
-        pxsize.setText(""+selected.pxsize);
-        addObject(pxsize, 7,7);
-
-        pxl = new Label("pixel size");
-        pxl.setSize(96,32);
-        pxl.setTextColor(Color.WHITE);
-        pxl.setBackgroundColor(Color.BLACK);
-        addObject(pxl, 3,7);
 
         start = new Button() {
             @Override
@@ -115,15 +168,26 @@ public class Settingsscreen extends World {
                 Snakeworld.Gamemode g = Snakeworld.Gamemode.from((String) gamemode.getSelected());
                 Settingsscreen s = (Settingsscreen) world;
                 if (g == Snakeworld.Gamemode.CUSTOM) {
-                        g = new Snakeworld.Gamemode("custom", Integer.parseInt(s.width.text), Integer.parseInt(s.height.text), Integer.parseInt(s.pxsize.text), Integer.parseInt(s.startsize.text), 0, 0);
+                    g = new Snakeworld.Gamemode("custom", Integer.parseInt(s.width.text), Integer.parseInt(s.height.text), Integer.parseInt(s.pxsize.text), Integer.parseInt(s.startsize.text), 0, 0);
                 }
                 try {
                     World w = new Snakeworld(g, Deathscreen.stats, Utils.loadImageFromAssets("background_tile"), 1);
                     setTps(Integer.parseInt(tps.text));
-                    System.out.println(e.tps);
+                    primary = new Color(((AdvancedImage)primaryColor.selected).getRGB(10,10));
+                    secondary = new Color(((AdvancedImage)secondaryColor.selected).getRGB(10,10));
+                    tertiary = new Color(((AdvancedImage)tertiaryColor.selected).getRGB(10,10));
+                    String name = (String) sprites.get("head").keySet().toArray()[sssi];
+                    Tile.corner = sprites.get("corner").get(name).replaceColor(new Color(0x00ff0000, true), primary).replaceColor(new Color(0x0000ff00,true), secondary).replaceColor(new Color(0x000000ff, true), tertiary);
+                    Tile.line = sprites.get("mid").get(name).replaceColor(new Color(0x00ff0000, true), primary).replaceColor(new Color(0x0000ff00,true), secondary).replaceColor(new Color(0x000000ff, true), tertiary);
+                    Tile.tail = sprites.get("tail").get(name).replaceColor(new Color(0x00ff0000, true), primary).replaceColor(new Color(0x0000ff00,true), secondary).replaceColor(new Color(0x000000ff, true), tertiary);
+                    Head.commonImage = sprites.get("head").get(name).replaceColor(new Color(0x00ff0000, true), primary).replaceColor(new Color(0x0000ff00,true), secondary).replaceColor(new Color(0x000000ff, true), tertiary);
+                    Tile.line = Tile.line.rotate(90);
+                    Tile.tail = Tile.tail.rotate(-90);
+                    Apple.skin = (AdvancedImage) sprites.get("apple").values().toArray()[ssai];
+                    Head.commonImage = Head.commonImage.rotate(90);
                     World.switchWorld(w);
                 }
-                    catch(IllegalArgumentException ex) {
+                catch(IllegalArgumentException ex) {
                     Label inv = new Label("Invalid arguments. Parameters must not be 0");
                     inv.setSize(400,32);
                     inv.setTextColor(Color.RED);
@@ -142,17 +206,7 @@ public class Settingsscreen extends World {
         start.setTextColor(Color.WHITE);
         start.setSize(96,32);
         start.setBackgroundColor(Color.BLUE);
-        addObject(start, 5,10);
-
-        tps = new Textfield();
-        tps.setText((int)e.tps+"");
-        addObject(tps, 7,8);
-
-        tpsl = new Label("Ticks per second");
-        tpsl.setBackgroundColor(Color.BLACK);
-        tpsl.setSize(150,32);
-        tpsl.setTextColor(Color.WHITE);
-        addObject(tpsl, 3,8);
+        addObject(start, 3,12);
 
         exit = new Button() {
             @Override
@@ -168,31 +222,174 @@ public class Settingsscreen extends World {
         exit.setSize(96,32);
         exit.setText("Exit");
         exit.setBackgroundColor(Color.RED);
-        addObject(exit, 5,12);
+        addObject(exit, 7,12);
 
+        swp = new Button() {
+            @Override
+            public void clickEvent(MouseEventInfo e) {
+                if (skin) {
+                    gameSettings();
+                }
+                else {
+                    gameSkins();
+                }
+                skin = !skin;
+            }
 
-        if ("custom".equals(gamemode.selected)) {
-            width.setText(Snakeworld.g.width+"");
-            height.setText(Snakeworld.g.height+"");
-            pxsize.setText(Snakeworld.g.pxsize+"");
-            startsize.setText(Snakeworld.g.start_size+"");
-        }
-        objectsOf(Textfield.class).forEach(tf -> {
-            tf.setSize(96,32);
-            tf.setBorderColor(Color.WHITE);
-            tf.setSelectedBorderColor(Color.GREEN);
-            tf.enabled = false;
-            tf.isNumeric = true;
-            tf.maxsize=2;
-        });
+            @Override
+            public void tick() {
 
-        startsize.maxsize = -1;
-        tps.enabled = true;
+            }
+        };
+        swp.setText(!skin?"game settings":"skin settings");
+        swp.setSize(128,32);
+        swp.setBackgroundColor(Color.ORANGE);
+        swp.setTextColor(Color.BLACK);
+        addObject(swp, 8,0);
     }
 
-    @Override
-    public void tick() {
+    public void gameSkins() {
+        removeAll();
+        addCommon();
 
+        if (primaryColor == null) {
+
+            primaryColor = new ScrollButton(clrs, clrs.get(0)){
+                public void clickEvent(MouseEventInfo e) {
+                    super.clickEvent(e);
+                    usrInputtedColor = true;
+                    skinSetSnake._update();
+                }
+            };
+
+            pcl = new Label("Colors");
+            pcl.setTextColor(Color.WHITE);
+            pcl.setBackgroundColor(Color.BLACK);
+            pcl.setSize(96, 32);
+
+            secondaryColor = new ScrollButton(clrs, clrs.get(0)){
+                public void clickEvent(MouseEventInfo e) {
+                    super.clickEvent(e);
+                    usrInputtedColor = true;
+                    skinSetSnake._update();
+                }
+            };
+
+            tertiaryColor = new ScrollButton(clrs, clrs.get(0)){
+                public void clickEvent(MouseEventInfo e) {
+                    super.clickEvent(e);
+                    usrInputtedColor = true;
+                    skinSetSnake._update();
+                }
+            };
+
+            nRndColors = new Button() {
+                @Override
+                public void clickEvent(MouseEventInfo e) {
+                    primaryColor.selectRandom();
+                    secondaryColor.selectRandom();
+                    tertiaryColor.selectRandom();
+                    usrInputtedColor = false;
+                    skinSetApple._update();
+                }
+
+                @Override
+                public void tick() {
+
+                }
+            };
+            nRndColors.setSize(128,32);
+            nRndColors.setTextColor(Color.WHITE);
+            nRndColors.setBackgroundColor(Color.BLUE);
+            nRndColors.setText("random Colors");
+
+            System.out.println(sprites);
+            skinSetSnake = new Button() {
+                @Override
+                public void clickEvent(MouseEventInfo e) {
+                    sssi = (sssi+1)%sprites.get("head").values().size();
+                    _update();
+                }
+
+                public void _update() {
+                    primary = new Color(((AdvancedImage)primaryColor.selected).getRGB(10,10));
+                    secondary = new Color(((AdvancedImage)secondaryColor.selected).getRGB(10,10));
+                    tertiary = new Color(((AdvancedImage)tertiaryColor.selected).getRGB(10,10));
+                    Color p = Settingsscreen.primary, s = Settingsscreen.secondary, t = Settingsscreen.tertiary;
+                    AdvancedImage tmp =(AdvancedImage) sprites.get("head").values().toArray()[sssi];
+                    tmp.imgs = AdvancedImage.ImageSizing.STRETCH;
+                    tmp = tmp.replaceColor(new Color(0x00ff0000, true), p).replaceColor(new Color(0x0000ff00,true), s).replaceColor(new Color(0x000000ff, true), t);
+                    setBackgroundImage(tmp);
+                }
+
+                @Override
+                public void tick() {
+
+                }
+            };
+            skinSetSnake.setSize(64,64);
+
+            sssl = new Label("Snake skin:");
+            sssl.setSize(96,64);
+            sssl.setTextColor(Color.WHITE);
+            sssl.setBackgroundColor(Color.BLACK);
+
+            skinSetApple = new Button() {
+                @Override
+                public void clickEvent(MouseEventInfo e) {
+                    ssai = (ssai+1)%sprites.get("apple").values().size();
+                    _update();
+                }
+
+                public void _update() {
+                    AdvancedImage tmp = (AdvancedImage) sprites.get("apple").values().toArray()[ssai];
+                    tmp = tmp.scale(64,64);
+                    setBackgroundImage(tmp);
+                }
+                @Override
+                public void tick() {
+
+                }
+            };
+            skinSetApple.setSize(64,64);
+
+
+            ssal = new Label("Apple skin:");
+            ssal.setSize(96,64);
+            ssal.setTextColor(Color.WHITE);
+            ssal.setBackgroundColor(Color.BLACK);
+
+            if (primary != null) {
+                primaryColor.select(primaryColor.options.stream().filter(i -> ((AdvancedImage) i).getRGB(10,10) == primary.getRGB()).findFirst().orElse(primaryColor.options.get(0)));
+                secondaryColor.select(secondaryColor.options.stream().filter(i -> ((AdvancedImage) i).getRGB(10,10) == secondary.getRGB()).findFirst().orElse(secondaryColor.options.get(0)));
+                tertiaryColor.select(tertiaryColor.options.stream().filter(i -> ((AdvancedImage) i).getRGB(10,10) == tertiary.getRGB()).findFirst().orElse(tertiaryColor.options.get(0)));
+            }
+            else {
+                primaryColor.selectRandom();
+                secondaryColor.selectRandom();
+                tertiaryColor.selectRandom();
+            }
+        }
+        if (!usrInputtedColor) {
+            primaryColor.selectRandom();
+            secondaryColor.selectRandom();
+            tertiaryColor.selectRandom();
+        }
+        skinSetApple._update();
+        skinSetSnake._update();
+
+        addObject(primaryColor, 3, 5);
+        addObject(secondaryColor, 5, 5);
+        addObject(tertiaryColor, 7, 5);
+        addObject(pcl, 1, 5);
+        addObject(nRndColors, 5,6);
+        addObject(skinSetSnake, 7,7);
+        addObject(sssl, 3,7);
+        addObject(skinSetApple,7,8);
+        addObject(ssal,3,8);
+        objectsOf(ScrollButton.class).forEach(sb -> {
+            sb.setSize(64, 64);
+        });
     }
 
     public List<AdvancedImage> colorOptions() {
@@ -250,6 +447,7 @@ public class Settingsscreen extends World {
     }
 
     public void windowClosed(WindowEvent e) {
+        System.out.println("saving stats");
         Filework.writeScores(Deathscreen.stats);
     }
 }

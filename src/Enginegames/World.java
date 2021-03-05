@@ -115,7 +115,7 @@ public abstract class World implements Tickable, KeyListener, MouseListener, Win
         tick();
         handleKeys();
         handleMouse();
-        objects.forEach(WorldObj::_tick);
+        objects.forEach(o -> {if (o.world != null) o._tick();});
         ui.paint(objects);
     }
 
@@ -189,10 +189,12 @@ public abstract class World implements Tickable, KeyListener, MouseListener, Win
      * switches the active world
      * @param world the world to be switched to
      */
-    public static void switchWorld(World world) {
+    public static List<World> switchWorld(World world) {
+        List<World> olds = e.tickables.stream().filter(t -> t instanceof World).map(t -> (World) t).collect(Collectors.toList());
         e.removeObjects(World.class);
         e.addObject(world);
         switchFocus(world);
+        return olds;
     }
 
     public static void switchFocus(World world) {

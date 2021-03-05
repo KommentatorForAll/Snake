@@ -77,7 +77,7 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
     private void drawImage_(BufferedImage image, int x, int y, float opaque) {
         Graphics2D g2d = createGraphics();
         g2d.setComposite(
-                AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opaque));
+                AlphaComposite.getInstance(AlphaComposite.SRC, opaque));
         g2d.drawImage(image, x, y, null);
         g2d.dispose();
     }
@@ -194,6 +194,19 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         return super.toString() + " sizing: " + imgs + "; Positioning: " + imgpos;
     }
 
+    public void print(){
+        int w = getWidth(), h = getHeight();
+        System.out.println("[");
+        for (int i = 0; i<w; i++) {
+            System.out.print("[");
+            for (int j = 0; j<h; j++) {
+                System.out.print("["+String.format("%8s",Integer.toHexString(getRGB(i,j))).replace(" ", "0")+"] ");
+            }
+            System.out.println("]");
+        }
+        System.out.println("]");
+    }
+
     /**
      * rotates the image and puts it onto a new image
      * @param angle the angle the image gets rotated by.
@@ -205,6 +218,7 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
 
     /**
      * rotates the image.
+     * !!meta data / rgb values on alpha-0 pixels is not getting copied!!
      * @param img the image which is gonna be rotated
      * @param angle the angle it gets rotated by
      * @return a rotated image
@@ -228,6 +242,8 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
 
         at.rotate(rads, x, y);
         g2d.setTransform(at);
+        g2d.setComposite(
+                AlphaComposite.getInstance(AlphaComposite.SRC, 1));
         g2d.drawImage(img, 0, 0, null);
         g2d.dispose();
 

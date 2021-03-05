@@ -3,6 +3,7 @@ package Enginegames;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Random;
 
 public class ScrollButton extends Button {
 
@@ -65,7 +66,7 @@ public class ScrollButton extends Button {
      * @param o the object to select
      * @throws IllegalArgumentException if the object is not an option.
      */
-    public void select(Object o) {
+    public void selectSpecific(Object o) {
         if (!options.contains(o)) throw new IllegalArgumentException();
         selected = o;
         if(selected instanceof String) {
@@ -74,6 +75,20 @@ public class ScrollButton extends Button {
         else {
             setBackgroundImage((AdvancedImage) selected);
         }
+    }
+
+    /**
+     *
+     * @param o
+     */
+    public void select(Object o) {
+        for (Object obj : options) {
+            if (obj.equals(o)) {
+                selectSpecific(obj);
+                return;
+            }
+        }
+        throw new IllegalArgumentException();
     }
 
     /**
@@ -137,5 +152,10 @@ public class ScrollButton extends Button {
     @Override
     public void tick() {
 
+    }
+
+    public void selectRandom() {
+        Random r = new Random();
+        selectSpecific(options.get(r.nextInt(options.size())));
     }
 }

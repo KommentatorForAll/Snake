@@ -2,6 +2,7 @@ package Enginegames.Snake;
 
 import Enginegames.*;
 import Enginegames.Button;
+import Enginegames.Label;
 
 import java.awt.*;
 import java.awt.event.WindowEvent;
@@ -13,32 +14,24 @@ public class Snakeworld extends World {
     public boolean started = false, running = false, wasDead, endless=true;
     public Head head;
     public Tag stats;
+    public Label l;
     public double sizingBorder = 0;
     public double increase_amount = 0;
-    public double bg_opaqueness = 1;
+    public double bg_opaqueness = 0.1;
     public static HashMap<String, Font> fonts = Utils.loadAllFonts();
     public static Gamemode g = Gamemode.DEFAULT;
+    public static AdvancedImage head_img = Utils.loadImageFromAssets("head/snake_flag_invis"),
+            line_img = Utils.loadImageFromAssets("mid/snake_flag_invis"),
+            corner_img = Utils.loadImageFromAssets("corner/snake_flag_invis"),
+            tail_img = Utils.loadImageFromAssets("tail/snake_flag_invis");
 
-    public Snakeworld() {
-        super(10, 10, 64);
-        Enginegames.Main.enableDebug = false;
-        stats = Filework.readScores();
-        stats.print();
-        setTps(8);
-        setPaintOrder(Head.class, Tile.class, Apple.class, Button.class);
-        setBackground(Utils.loadImageFromAssets("background_tile"));
-        //setBackground(Utils.loadImageFromAssets("invis"));
-        //setBackground(null);
-        setBackgroundOption(WorldUI.ImageOption.TILED);
-        setBackgroundOpaqueness(bg_opaqueness);
-    }
 
     public Snakeworld(Gamemode g, Tag stats, AdvancedImage bg_img, double bg_opaqueness) {
         super(g.width, g.height, g.pxsize);
         Enginegames.Main.enableDebug = false;
         Snakeworld.g = g;
         setTps(g.tps);
-        setPaintOrder(Head.class, Tile.class, Apple.class, Button.class);
+        setPaintOrder(Label.class, Head.class, Tile.class, Apple.class, Button.class);
         setBackgroundOption(WorldUI.ImageOption.TILED);
         this.bg_opaqueness = bg_opaqueness;
         this.stats = stats;
@@ -56,17 +49,13 @@ public class Snakeworld extends World {
 
         wasDead = true;
         removeAll();
-        switchWorld(new Deathscreen(stats, head.size-g.start_size, g.name, "player1", this));
+        switchWorld(new Deathscreen(stats, head.size-g.start_size, g.name, this));
         //setBackground(null);
         //stop();
     }
 
     public void tick() {
         t++;
-        if (started && !running) {
-            started = true;
-            running = true;
-        }
     }
 
     public void begin() {
@@ -77,12 +66,17 @@ public class Snakeworld extends World {
 
     public void resume() {
         running = true;
-        if (!e.started) start();
+        if (l != null) removeObject(l);
+        System.out.println(l);
     }
 
     public void pause() {
         running = false;
-        stop();
+        l = new Label("PAUSED");
+        l.setTextColor(Color.WHITE);
+        l.setBackgroundColor(Color.BLACK);
+        l.setFont(fonts.get("pixel-bubble").deriveFont(30F));
+        addObject(l, width/2, height/2);
     }
 
     public void keyPressed(int key) {
@@ -105,6 +99,7 @@ public class Snakeworld extends World {
     }
 
     public void windowClosed(WindowEvent e) {
+        System.out.println("saving stats");
         Filework.writeScores(stats);
     }
 

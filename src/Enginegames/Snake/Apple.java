@@ -7,8 +7,10 @@ import Enginegames.WorldObj;
 
 public class Apple extends WorldObj {
 
+    public static AdvancedImage skin;
+
     public Apple() {
-        setImage(Utils.loadImageFromAssets("apple"));
+        setImage(skin == null?Utils.loadImageFromAssets("apple/apple"):skin);
         img.imgs = AdvancedImage.ImageSizing.STRETCH;
     }
 

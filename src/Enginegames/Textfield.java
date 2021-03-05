@@ -37,10 +37,12 @@ public class Textfield extends Button {
     }
 
     public final void deselect() {
-        isSelected = false;
-        Color tmp = borderColor;
-        setBorderColor(selectedBorderColor);
-        selectedBorderColor = tmp;
+        if (isSelected) {
+            isSelected = false;
+            Color tmp = borderColor;
+            setBorderColor(selectedBorderColor);
+            selectedBorderColor = tmp;
+        }
     }
 
     public final void keyTyped(int c) {

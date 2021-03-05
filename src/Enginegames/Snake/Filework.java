@@ -1,8 +1,11 @@
 package Enginegames.Snake;
 
+import Enginegames.AdvancedImage;
 import Enginegames.Utils;
 
+import javax.imageio.ImageIO;
 import java.io.*;
+import java.util.HashMap;
 
 public class Filework {
 
@@ -35,28 +38,28 @@ public class Filework {
         }
     }
 
-    public static Tag newGameInstance(String gamename, int highscore, String playername) {
+    public static Tag newGameInstance(String gamename, int highscore) {
         //E, bc E is a lot better than T
         Tag[] e = new Tag[4];
-        e[0]=new Tag(Tag.Type.TAG_String, "playername", playername);
+        e[0]=new Tag(Tag.Type.TAG_String, "playername", "");
         e[1]=new Tag(Tag.Type.TAG_Int, "highscore", highscore);
         e[2]=new Tag(Tag.Type.TAG_Int, "gamecount", 1);
         e[3]=new Tag(Tag.Type.TAG_Double, "avgscore", highscore*01.0);
         return new Tag(Tag.Type.TAG_Compound, gamename, e);
     }
 
-    public static void addToStats(Tag stats, String gamename, int highscore, String playername) {
-        stats.addTag(newGameInstance(gamename, highscore, playername));
+    public static void addToStats(Tag stats, String gamename, int highscore) {
+        stats.addTag(newGameInstance(gamename, highscore));
     }
 
     public static Tag createDefaultSave() {
         return new Tag(Tag.Type.TAG_Compound, "snake", new Tag[] {new Tag(Tag.Type.TAG_End, null, null)} );
     }
 
-    public static boolean checkHighscore(Tag stats, String gamename, int score, String playername) {
+    public static boolean checkHighscore(Tag stats, String gamename, int score) {
         Tag game = stats.findNextTag(gamename);
         if (game == null) {
-            game = newGameInstance(gamename, score, playername);
+            game = newGameInstance(gamename, score);
             stats.addTag(game);
             return true;
         }
@@ -73,12 +76,15 @@ public class Filework {
         game.print();
         stats.print();
 
-        if (score > (int)highscore.getValue()) {
-            highscore.setValue(score);
-            game.findNextTag("playername").setValue(playername);
-            return true;
-        }
-        return false;
+        return (score > (int)highscore.getValue());
+    }
+
+    public static void setHighscore(int score, Tag stats, String gamename, String playername) {
+        Tag game = stats.findNextTag(gamename);
+        Tag highscore = game.findNextTag("highscore");
+        highscore.setValue(score);
+        game.findNextTag("playername").setValue(playername);
+
     }
 
 
@@ -88,5 +94,30 @@ public class Filework {
 
     public static int getHighscore(Tag stats, String gamename) {
         return (int) stats.findNextTag(gamename).get("highscore");
+    }
+
+    public static HashMap<String, HashMap<String, AdvancedImage>> loadAllSprites() {
+        File folder = new File(System.getProperty("user.dir")+"/assets/sprites/");
+        HashMap<String, HashMap<String, AdvancedImage>> sprites = new HashMap<>();
+        HashMap<String, AdvancedImage> tmp;
+        for (File f : folder.listFiles()) {
+            if (!f.isDirectory()) continue;
+            boolean fn = f.getName().equals("apple");
+            System.out.println(fn + " "+ f.getName());
+            tmp = new HashMap<>();
+            for(File img : f.listFiles()) {
+                //System.out.println(img.getName());
+                String name = img.getName();
+                //System.out.println(img.getAbsoluteFile());
+                if ((!name.endsWith("_invis.png")) && !fn) continue;
+                try {
+                    tmp.put(name.replace("\\.png", ""), new AdvancedImage(ImageIO.read(img.getAbsoluteFile())));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            sprites.put(f.getName(), tmp);
+        }
+        return sprites;
     }
 }

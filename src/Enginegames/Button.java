@@ -150,4 +150,8 @@ public abstract class Button extends WorldObj {
         update();
     }
 
+    /**
+     * ignore it?
+     */
+    public void _update() {}
 }

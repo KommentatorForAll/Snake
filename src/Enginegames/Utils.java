@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Utils {
 
@@ -150,4 +151,39 @@ public class Utils {
         return fonts;
     }
 
+    public static void createImage(File output, int size) throws IOException
+    {
+        BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+
+        for (int i = 0; i < size * size; i++)
+        {
+            image.setRGB(i % size, i / size, 0x00FF0000);
+        }
+
+        if (!ImageIO.write(image, "png", output))
+        {
+            System.err.println("No writer found!");
+        }
+    }
+
+
+    public static void readImage(File file) throws IOException
+    {
+        BufferedImage image = ImageIO.read(file);
+        for (int y = 0; y < image.getHeight(); y++)
+        {
+            for (int x = 0; x < image.getWidth(); x++)
+            {
+                System.out.printf(" %s ", Integer.toHexString(image.getRGB(x, y)));
+            }
+            System.out.println();
+        }
+    }
+
+    public static Object getKey(Map m, Object value) {
+        for (Object x : m.keySet()) {
+            if (m.get(x).equals(value)) return x;
+        }
+        return null;
+    }
 }
