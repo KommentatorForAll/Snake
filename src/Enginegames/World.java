@@ -155,6 +155,14 @@ public abstract class World implements Tickable, KeyListener, MouseListener, Win
     }
 
     /**
+     * removes all objects of the given class
+     * @param cls the class of the objects to remove
+     */
+    public final <T extends WorldObj> void removeObjects(Class<T> cls) {
+        objects.removeAll(objectsOf(cls));
+    }
+
+    /**
      * deltes all objects from the world
      */
     public final void removeAll() {

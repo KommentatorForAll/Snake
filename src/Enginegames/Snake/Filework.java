@@ -5,7 +5,10 @@ import Enginegames.Utils;
 
 import javax.imageio.ImageIO;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class Filework {
 
@@ -96,15 +99,15 @@ public class Filework {
         return (int) stats.findNextTag(gamename).get("highscore");
     }
 
-    public static HashMap<String, HashMap<String, AdvancedImage>> loadAllSprites() {
+    public static Map<String, Map<String, AdvancedImage>> loadAllSprites() {
         File folder = new File(System.getProperty("user.dir")+"/assets/sprites/");
-        HashMap<String, HashMap<String, AdvancedImage>> sprites = new HashMap<>();
-        HashMap<String, AdvancedImage> tmp;
+        Map<String, Map<String, AdvancedImage>> sprites = new TreeMap<>();
+        Map<String, AdvancedImage> tmp;
         for (File f : folder.listFiles()) {
             if (!f.isDirectory()) continue;
             boolean fn = f.getName().equals("apple");
             System.out.println(fn + " "+ f.getName());
-            tmp = new HashMap<>();
+            tmp = new TreeMap<>();
             for(File img : f.listFiles()) {
                 //System.out.println(img.getName());
                 String name = img.getName();
@@ -119,5 +122,20 @@ public class Filework {
             sprites.put(f.getName(), tmp);
         }
         return sprites;
+    }
+
+    public static ArrayList<Snakeworld.Gamemode> loadGamemodes() {
+        ArrayList<Snakeworld.Gamemode> gms = new ArrayList<>();
+
+        String f = Utils.readFromAssets("others/Gamemodes.gms");
+        String[] split;
+        for (String line : f.split("\n")) {
+            split = line.split(",");
+            gms.add(new Snakeworld.Gamemode(split[0], Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]), Integer.parseInt(split[4]), Double.parseDouble(split[5]), Double.parseDouble(split[6])));
+        }
+        gms.add(Snakeworld.Gamemode.DEFAULT);
+        gms.add(Snakeworld.Gamemode.CUSTOM);
+
+        return gms;
     }
 }

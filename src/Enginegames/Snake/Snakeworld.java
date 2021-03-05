@@ -66,7 +66,7 @@ public class Snakeworld extends World {
 
     public void resume() {
         running = true;
-        if (l != null) removeObject(l);
+        removeObjects(Label.class);
         System.out.println(l);
     }
 
@@ -106,12 +106,8 @@ public class Snakeworld extends World {
     public static class Gamemode {
 
         public static Gamemode DEFAULT = new Gamemode("default", 10, 10, 64, 2, 0,0);
-        public static Gamemode BIG = new Gamemode("big", 50,25,32,2,0,0);
-        public static Gamemode GIANT = new Gamemode("giant", 75, 35,16, 2, 0,0);
-        public static Gamemode ENDLESS = new Gamemode("endless", 10,10,64,2,1.1,.75);
-        public static Gamemode TRON = new Gamemode("tron", 15,15,64,99999,0,0);
         public static Gamemode CUSTOM = new Gamemode("custom", 0,0,0,0,0,0);
-        public static Gamemode[] values = {DEFAULT, BIG, GIANT, ENDLESS, TRON, CUSTOM};
+        public static Gamemode[] values = Filework.loadGamemodes().toArray(new Gamemode[0]);
 
         public int width, height, pxsize;
         public int start_size;

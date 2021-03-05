@@ -7,9 +7,7 @@ import Enginegames.Label;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,9 +20,9 @@ public class Settingsscreen extends World {
     public static boolean skin, usrInputtedColor;
     public List<AdvancedImage> clrs = colorOptions();
     public static Color primary, secondary, tertiary;
-    public int ssai, sssi;
+    public int ssai = 0, sssi = 1;
 
-    public static HashMap<String, HashMap<String, AdvancedImage>> sprites = Filework.loadAllSprites();
+    public static Map<String, Map<String, AdvancedImage>> sprites = Filework.loadAllSprites();
 
     public Settingsscreen() {
         super(10,15,64);

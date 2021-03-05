@@ -5,19 +5,20 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.*;
 
 public class Utils {
 
-    public static String assets = System.getProperty("user.dir")+"/assets/";
+    public static String assets = System.getProperty("user.dir")+"\\assets\\";
 
     /**
      * loads an image from anywhere on your pc.
      * if no extention is given, .png is added automaticly
+     * note: this works in both, in folder as well as in jar structures.
+     * this also works with folders in folders.
      * @param filelocation the location of the image
      * @return the loaded image. !!may be null if no image was found!!
      */
@@ -26,7 +27,10 @@ public class Utils {
             filelocation += ".png";
         }
         try {
-            return new AdvancedImage(ImageIO.read(new File(filelocation)));
+            InputStream is = Utils.class.getResourceAsStream(filelocation);
+            if (is == null)
+                return new AdvancedImage(ImageIO.read(new File(filelocation)));
+            return new AdvancedImage(ImageIO.read(is));
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -185,5 +189,28 @@ public class Utils {
             if (m.get(x).equals(value)) return x;
         }
         return null;
+    }
+
+    /**
+     * reads a file from the assets. this works in both, folder and jar structures.
+     * @param filename the file to read.
+     * @return the string inside of that file.
+     */
+    public static String readFromAssets(String filename) {
+        InputStream is = Utils.class.getResourceAsStream(assets+filename);
+        Scanner sc;
+        if (is == null) {
+            try {
+                sc = new Scanner(new File(assets+filename));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return "";
+            }
+        }
+        else
+            sc = new Scanner(is);
+
+        sc.useDelimiter("\\z");
+        return sc.next();
     }
 }
