@@ -123,7 +123,7 @@ public class Filework {
     public static ArrayList<Snakeworld.Gamemode> loadGamemodes() {
         ArrayList<Snakeworld.Gamemode> gms = new ArrayList<>();
 
-        String f = Utils.readFromAssets("others/Gamemodes.gms");
+        String f = Utils.readFromAssets("others/.gamemodes");
         String[] split;
         for (String line : f.split("\n")) {
             split = line.split(",");
