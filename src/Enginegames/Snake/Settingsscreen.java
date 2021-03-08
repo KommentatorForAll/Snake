@@ -288,7 +288,7 @@ public class Settingsscreen extends World {
                     secondaryColor.selectRandom();
                     tertiaryColor.selectRandom();
                     usrInputtedColor = false;
-                    skinSetApple._update();
+                    skinSetSnake._update();
                 }
 
                 @Override

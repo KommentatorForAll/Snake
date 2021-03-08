@@ -2,17 +2,21 @@ package Enginegames;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 public class Utils {
 
-    public static String assets = System.getProperty("user.dir")+"\\assets\\";
+    public static String assets;
+    public static String localAppdata = fetchAppdataFolder();
+    public static JarFile me;
+    private static boolean attemptedJar;
+
 
     /**
      * loads an image from anywhere on your pc.
@@ -43,6 +47,7 @@ public class Utils {
      * @return the loaded image !!may be null if no image was found!!
      */
     public static AdvancedImage loadImageFromAssets(String filename) {
+        if (!attemptedJar) attemptJar();
         return loadImage(assets+"sprites/" +filename);
     }
 
@@ -65,7 +70,7 @@ public class Utils {
         String[] lines = text.split("[\n\r]");
         FontMetrics fontMetrics = graphics.getFontMetrics(font);
         int height = fontMetrics.getHeight();
-        int width = Arrays.stream(lines).map(fontMetrics::stringWidth).max((a, b) -> a - b).orElse(0);
+        int width = Arrays.stream(lines).map(fontMetrics::stringWidth).max(Comparator.comparingInt(a -> a)).orElse(0);
         return new int[] {width, height};
     }
 
@@ -84,13 +89,18 @@ public class Utils {
      */
     public static String getOS() {
         String os = System.getProperty("os.name");
-        System.out.println(os);
+        if (Main.enableDebug)
+            System.out.println(os);
         if (os.contains("Windows")) return "windows";
         if (os.contains("Mac")) return "mac";
         if (os.contains("Linux")) return "linux";
         return os;
     }
 
+    /**
+     * returns the appdata folder of the running os
+     * @return the appdata folders location
+     */
     public static String fetchAppdataFolder() {
         return fetchAppdataFolder(getOS());
     }
@@ -106,14 +116,19 @@ public class Utils {
             return dir+"/";
         switch (os) {
             case "mac":
-                return " ~/Library/Application Support/";//"bad os, we don't support such crap";
+                return System.getProperty("user.home")+"/Library/Application Support/";//"bad os, we don't support such crap";
             case "linux":
-                return "~/.config/";
+                return System.getProperty("user.home")+"/.config/";
             default:
                 return "./";
         }
     }
 
+    /**
+     * loads a font from the assets/fonts folder
+     * @param name the font name to load
+     * @return the newly created font
+     */
     public static Font loadFontFromAssets(String name) {
         // Creates an awt font from the file as true type font (.ttf)
         Font font = null;
@@ -135,6 +150,7 @@ public class Utils {
      * @return an hashmap of fonts as name -> font
      */
     public static HashMap<String, Font> loadAllFonts() {
+        if (!attemptedJar) attemptJar();
         HashMap<String, java.awt.Font> fonts = new HashMap<>();
         File dir = new File(assets+"fonts/");
         File[] dirFiles = dir.listFiles();
@@ -155,22 +171,11 @@ public class Utils {
         return fonts;
     }
 
-    public static void createImage(File output, int size) throws IOException
-    {
-        BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
-
-        for (int i = 0; i < size * size; i++)
-        {
-            image.setRGB(i % size, i / size, 0x00FF0000);
-        }
-
-        if (!ImageIO.write(image, "png", output))
-        {
-            System.err.println("No writer found!");
-        }
-    }
-
-
+    /**
+     * reads an image from a file
+     * @param file the file to read the image from
+     * @throws IOException thrown when an IOException occurs in ImageIO.read()
+     */
     public static void readImage(File file) throws IOException
     {
         BufferedImage image = ImageIO.read(file);
@@ -184,6 +189,12 @@ public class Utils {
         }
     }
 
+    /**
+     * returns the first match of the value, in the map
+     * @param m the map to search in
+     * @param value the value to search for
+     * @return key of the first occurrence of the value
+     */
     public static Object getKey(Map m, Object value) {
         for (Object x : m.keySet()) {
             if (m.get(x).equals(value)) return x;
@@ -212,5 +223,121 @@ public class Utils {
 
         sc.useDelimiter("\\z");
         return sc.next();
+    }
+
+    /**
+     * extracts an package from the jar if in jar
+     * @param source the package to extract
+     * @param to where to extract it
+     * @return the location as file of the extracted package/file. returns the original location when not loaded from jar
+     */
+    public static File extract(String source, String to) {
+        String dirPath = to+source.replaceAll("[^/]*\\..*$","");
+        attemptJar();
+        if (me == null) return new File("src/"+source);
+        try {
+            if (Main.enableDebug)
+                System.out.println("Creating path for "+dirPath);
+            Files.createDirectories(Paths.get(dirPath));
+            JarEntry je = me.getJarEntry(source);
+            if (Main.enableDebug)
+                System.out.println("Found entry: " + je);
+            if ( je != null)
+            {
+                if (je.isDirectory()) {
+                    me.stream().filter(e -> e.getName().startsWith(source)).forEach(e -> extractFile(e.getName(), to));
+                    return new File(to);
+                }
+                else {
+                    return extractFile(je.getName(), to);
+                }
+            }
+        }
+        catch(IOException ioe)
+        {
+            System.out.println("Exception: " + ioe);
+            ioe.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     *  This method is responsible for extracting resource files from within the .jar to the temporary directory.
+     *  @param sourceFile The filepath relative to the 'Resources/' directory within the .jar from which to extract the file.
+     *  @return A file object to the extracted file
+     **/
+    public static File extractFile(String sourceFile, String to)
+    {
+        String dirPath = to+ sourceFile.replaceAll(".*\\..*$","");
+        try {
+            if (Main.enableDebug)
+                System.out.println("Creating files for "+dirPath);
+            Files.createDirectories(Paths.get(dirPath));
+            JarEntry jarEntry = me.getJarEntry(sourceFile);
+            if (Main.enableDebug)
+                System.out.println("Found entry: " + jarEntry);
+            if ( jarEntry != null && !jarEntry.isDirectory())
+            {
+                //Getting the jarEntry into the inputStream
+                InputStream inputStream = me.getInputStream(jarEntry);
+                //Creating a output stream to a new file of our choice
+                FileOutputStream fileOutputStream = new java.io.FileOutputStream(to+ sourceFile);
+                if (Main.enableDebug)
+                    System.out.println("Attempting to create file: " + sourceFile);
+                while (inputStream.available() != 0)
+                {
+                    fileOutputStream.write(inputStream.read());
+                }
+                if (Main.enableDebug)
+                    System.out.println("Created file: " + sourceFile);
+                fileOutputStream.close();
+                inputStream.close();
+                return new File(to+sourceFile);
+            }
+            return new File(sourceFile);
+        }
+        catch(IOException ioe)
+        {
+            System.out.println("Exception: " + ioe);
+            ioe.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * checks if loaded from an jar file. Extracts the assets if loaded from jar.
+     */
+    public static void attemptJar() {
+        if (attemptedJar) return;
+
+        try {
+            String fname = new File(Utils.class.getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .getPath())
+                    .getName();
+            me = new JarFile("./"+ fname);
+            attemptedJar = true;
+            if (assets == null) {
+                assets = localAppdata + removeExt(fname)+"/";
+            }
+            extract("assets", assets);
+            assets += "assets/";
+        }
+        catch (Exception e) {
+            assets  = System.getProperty("user.dir")+"/src/assets/";
+            System.err.println("error while fetching jar:");
+            e.printStackTrace();
+        }
+        attemptedJar = true;
+    }
+
+    /**
+     * Removes the file extension of a string
+     * @param s the filename with extension
+     * @return the filename without extension
+     */
+    public static String removeExt(String s) {
+        return s.replaceAll("\\..*$", "");
     }
 }

@@ -16,6 +16,7 @@ public class Main {
     }
 
     public Main(boolean isAdContaminated) {
+        //Utils.assets = Utils.localAppdata + "Spielebox/Snake/";
         World.setTps(8);
         world = new Settingsscreen();
         Deathscreen.stats = Filework.readScores();

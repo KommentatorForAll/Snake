@@ -5,14 +5,13 @@ import Enginegames.Utils;
 
 import javax.imageio.ImageIO;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Filework {
 
     public static String sfl = Utils.fetchAppdataFolder()+ "Spielebox/Snake/";
+    public static File sprites = Utils.extract("assets/sprites", sfl);
+
 
     public static Tag readScores() {
         try {
@@ -100,18 +99,15 @@ public class Filework {
     }
 
     public static Map<String, Map<String, AdvancedImage>> loadAllSprites() {
-        File folder = new File(System.getProperty("user.dir")+"/assets/sprites/");
         Map<String, Map<String, AdvancedImage>> sprites = new TreeMap<>();
         Map<String, AdvancedImage> tmp;
-        for (File f : folder.listFiles()) {
+        Filework.sprites = new File(Utils.assets+"/sprites");
+        for (File f : Filework.sprites.listFiles()) {
             if (!f.isDirectory()) continue;
             boolean fn = f.getName().equals("apple");
-            System.out.println(fn + " "+ f.getName());
             tmp = new TreeMap<>();
             for(File img : f.listFiles()) {
-                //System.out.println(img.getName());
                 String name = img.getName();
-                //System.out.println(img.getAbsoluteFile());
                 if ((!name.endsWith("_invis.png")) && !fn) continue;
                 try {
                     tmp.put(name.replace("\\.png", ""), new AdvancedImage(ImageIO.read(img.getAbsoluteFile())));
@@ -133,8 +129,8 @@ public class Filework {
             split = line.split(",");
             gms.add(new Snakeworld.Gamemode(split[0], Integer.parseInt(split[1]), Integer.parseInt(split[2]), Integer.parseInt(split[3]), Integer.parseInt(split[4]), Double.parseDouble(split[5]), Double.parseDouble(split[6])));
         }
-        gms.add(Snakeworld.Gamemode.DEFAULT);
         gms.add(Snakeworld.Gamemode.CUSTOM);
+        gms.add(Snakeworld.Gamemode.DEFAULT);
 
         return gms;
     }

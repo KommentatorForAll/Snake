@@ -63,12 +63,13 @@ public class GameUI extends JFrame {
     }
 
     public void switchWorld(World world) {
-        System.out.println("switching world..");
         if (Main.enableDebug) {
+            System.out.println("switching world..");
             System.out.println("Old world: " + this.world);
             System.out.println("Switching to: " + world);
         }
 
+        mpos = getLastMonitorPosition();
         World.mainframe = this;
         WorldUI worldUI = world.ui;
         removeMouseListener(this.world);
@@ -85,7 +86,8 @@ public class GameUI extends JFrame {
             y += 200;
         }
         Dimension d = new Dimension(x+bardim[0], y+bardim[1]);
-        System.out.println(d);
+        if (Main.enableDebug)
+            System.out.println("new Frame dimensions: "+d);
         setMinimumSize(d);
         setSize(d);
         worldUI.setLocation(x/2-worldUI.getWidth()/2-bardim[0], y/2-worldUI.getHeight()/2-bardim[1]);
