@@ -5,10 +5,25 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
+/**
+ * A Button with a list of options to choose from.
+ * Selected item is changed with left- and right-click.
+ */
 public class ScrollButton extends Button {
 
+    /**
+     * The options the user is able to choose from
+     */
     public ArrayList<Object> options =  new ArrayList<>();
+
+    /**
+     * The currently selected Item
+     */
     public Object selected;
+
+    /**
+     * If the button wraps around, when reaching an edge of the options
+     */
     public boolean loop = true;
 
     /**
@@ -78,10 +93,11 @@ public class ScrollButton extends Button {
     }
 
     /**
-     *
-     * @param o
+     * Selects the given. object must be in the list
+     * @param o the object to select
+     * @throws IllegalArgumentException when no equal item is in the list
      */
-    public void select(Object o) {
+    public void select(Object o) throws IllegalArgumentException {
         for (Object obj : options) {
             if (obj.equals(o)) {
                 selectSpecific(obj);
@@ -149,11 +165,17 @@ public class ScrollButton extends Button {
 
     }
 
+    /**
+     * does nothing
+     */
     @Override
     public void tick() {
 
     }
 
+    /**
+     * selects an random entry from the options.
+     */
     public void selectRandom() {
         Random r = new Random();
         selectSpecific(options.get(r.nextInt(options.size())));

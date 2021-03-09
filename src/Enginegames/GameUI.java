@@ -8,60 +8,95 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.util.Arrays;
 
+/**
+ * The JFrame the worlds get shown on.
+ *
+ */
 public class GameUI extends JFrame {
 
+    /**
+     * If the world contains just way to many ads.
+     * Currently not in use. may either be implemented or removed later
+     * @deprecated
+     */
     public boolean adContaminated;
+
+    /**
+     * A list of graphical Devices AKA Monitors connected to the pc.
+     */
     public GraphicsDevice[] monitors = getMonitors();
 
-    public int[] bardim, mpos;
+    /**
+     * The dimenstion of the bar at the top, showing the minimize, maximize and close Button
+     */
+    public int[] bardim;
+
+    /**
+     * The position of the last monitor
+     */
+    public int[] mpos;
+
+    /**
+     * The currently displayed World
+     */
     public World world;
 
+    /**
+     * Creates a new UI for a world
+     * @param name the name displayed at the taskbar
+     * @param world the world
+     */
     public GameUI(String name, World world) {
         this(name, world.ui);
     }
 
+    /**
+     * Creates a new UI for a jpannel
+     * @param name name displayed at the taskbar
+     * @param worldUI the worlds UI
+     */
     public GameUI(String name, JPanel worldUI) {
         this(name, worldUI, true, null, null);
     }
 
+    /**
+     * Creates a new UI for a JPanel
+     * @param name the name displayed at the taskbar
+     * @param world the world to create the UI for
+     * @param adContaminated currently uselsess
+     */
     public GameUI(String name, World world, boolean adContaminated) {
         this(name, world.ui, adContaminated, world, world);
     }
 
+    /**
+     * Creates a new UI for a world
+     * @param name name, displayed at the taskbar
+     * @param worldUI the ui of the world
+     * @param adContaminated if the world is ad contaminated (useless currently)
+     * @param kl the litener, keyevents get redirected to
+     * @param ml the listener, mouseevents get redirected to
+     */
     public GameUI(String name, JPanel worldUI, boolean adContaminated, KeyListener kl, MouseListener ml) {
         super(name);
         setLayout(null);
         //setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-        int x = worldUI.getWidth(), y = worldUI.getHeight();
-        if (adContaminated) {
-            x += 600;
-            y += 200;
-        }
-//        addKeyListener(kl);
-//        addMouseListener(ml);
         setVisible(true);
 
         bardim = getBorderDims();
         if (Main.enableDebug)
             System.out.println("Bar dimension: "+Arrays.toString(bardim));
-//        worldUI.setLocation(x/2-worldUI.getWidth()/2-bardim[0], y/2-worldUI.getHeight()/2-bardim[1]);
-//        add(worldUI);//, BorderLayout.CENTER);
         this.adContaminated = adContaminated;
-
-//        addComponentListener(new ComponentAdapter()
-//        {
-//            public void componentResized(ComponentEvent evt) {
-//                int x = getWidth(), y = getHeight();
-//                worldUI.setLocation(x/2-worldUI.getWidth()/2-(bardim[0]/2), y/2-worldUI.getHeight()/2-(bardim[1]/2));
-//            }
-//        });
         switchWorld((World) kl);
         mpos = getLastMonitorPosition();
         setLocation(mpos[0]-worldUI.getWidth()/2,mpos[1]-worldUI.getHeight()/2);
     }
 
+    /**
+     * Switches the world to another world
+     * @param world The new world to switch to
+     */
     public void switchWorld(World world) {
         if (Main.enableDebug) {
             System.out.println("switching world..");
@@ -91,7 +126,7 @@ public class GameUI extends JFrame {
         setMinimumSize(d);
         setSize(d);
         worldUI.setLocation(x/2-worldUI.getWidth()/2-bardim[0], y/2-worldUI.getHeight()/2-bardim[1]);
-        add(worldUI);//, BorderLayout.CENTER);
+        add(worldUI);
 
 
         addComponentListener(new ComponentAdapter()
@@ -141,7 +176,6 @@ public class GameUI extends JFrame {
      * @return dimension of the toolbar
      */
     public int[] getBorderDims() {
-        Dimension size = getSize();
         Insets insets = getInsets();
         if (insets != null) {
             return new int[] {insets.left+insets.right, insets.top+insets.bottom};

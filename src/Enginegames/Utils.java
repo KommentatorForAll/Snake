@@ -10,11 +10,30 @@ import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+/**
+ * A utility class capable of loading images, extracting assets from a compressed jar etc.
+ */
 public class Utils {
 
+    /**
+     * The location of the (eventually extracted) assets folder
+     */
     public static String assets;
+
+    /**
+     * The location of the appdata folder, dependent on the OS one is running
+     */
     public static String localAppdata = fetchAppdataFolder();
+
+    /**
+     * The Jar loaded from, when loaded in a jar
+     * null if loaded from a folder structure
+     */
     public static JarFile me;
+
+    /**
+     * if there was an attempt to fetch the jar file
+     */
     private static boolean attemptedJar;
 
 

@@ -20,7 +20,7 @@ public class Settingsscreen extends World {
     public static boolean skin, usrInputtedColor;
     public List<AdvancedImage> clrs = colorOptions();
     public static Color primary, secondary, tertiary;
-    public int ssai = 0, sssi = 1;
+    public int ssai = 1, sssi = 2;
 
     public static Map<String, Map<String, AdvancedImage>> sprites = Filework.loadAllSprites();
 
@@ -434,12 +434,14 @@ public class Settingsscreen extends World {
         c.add(new Color(0xC15));
         c.add(new Color(0xB16B00B5));
         c.add(new Color(0x71DD1E5));
+        c.add(new Color(0xE));
 
         for (Color clr : c) {
             AdvancedImage img = new AdvancedImage(64,64);
             img.fill(clr);
             imgs.add(img);
         }
+        imgs.get(5).print();
 
         return imgs;
     }

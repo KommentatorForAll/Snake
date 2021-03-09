@@ -2,6 +2,9 @@ package Enginegames;
 
 import java.awt.*;
 
+/**
+ * A textfield, used to enter Text or numbers by the user.
+ */
 public class Textfield extends Button {
 
     /**
@@ -9,10 +12,31 @@ public class Textfield extends Button {
      * -1 for no length limit
      */
     public int maxsize = -1;
-    public boolean isNumeric, isSelected;
+
+    /**
+     * If only Numbers are allowed in the textfield
+     */
+    public boolean isNumeric,
+    /**
+     * if the Texfield is currently selected aka if one is writing into it
+     * Default Value: {@link true}
+     */
+            isSelected;
+    /**
+     * The color, the Border becomes, when the Field is active
+     */
     public Color selectedBorderColor;
 
+    /**
+     * The characters the user is able to input into the textfield.
+     * Must be a {@link java.util.regex.Pattern} string
+     */
+    public String charset = "[ -~äöüÄÖÜ]";
 
+    /**
+     * Deselects all other textfields and selects this one
+     * @param e the click event information
+     */
     @Override
     public final void clickEvent(MouseEventInfo e) {
         world.objectsOf(Textfield.class).forEach(Textfield::deselect);
@@ -22,20 +46,9 @@ public class Textfield extends Button {
         selectedBorderColor = tmp;
     }
 
-    @Override
-    public void tick() {
-
-    }
-
-    public final void setSelectedBorderColor(Color clr) {
-        if (isSelected) {
-            setBorderColor(clr);
-        }
-        else {
-            selectedBorderColor = clr;
-        }
-    }
-
+    /**
+     * deselects the current button
+     */
     public final void deselect() {
         if (isSelected) {
             isSelected = false;
@@ -45,8 +58,33 @@ public class Textfield extends Button {
         }
     }
 
+    /**
+     * does nothing
+     */
+    @Override
+    public void tick() {
+
+    }
+
+    /**
+     * sets the Bordercolor, for when the field is selected
+     * @param clr the new Color
+     */
+    public final void setSelectedBorderColor(Color clr) {
+        if (isSelected) {
+            setBorderColor(clr);
+        }
+        else {
+            selectedBorderColor = clr;
+        }
+    }
+
+    /**
+     * Called when a key is typed.
+     * @param c the ascii value of the pressed key
+     */
     public final void keyTyped(int c) {
-        if ((""+ (char) c).matches("\\W")) {
+        if (!(""+ (char) c).matches(charset)) {
             if (c == 8) {
                 if (!text.isEmpty()) {
                     setText(text.substring(0, text.length()-1));

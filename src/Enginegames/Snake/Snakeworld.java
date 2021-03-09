@@ -11,24 +11,19 @@ import java.util.HashMap;
 public class Snakeworld extends World {
 
     public int t = 0;
-    public boolean started = false, running = false, wasDead, endless=true;
+    public boolean running, wasDead;
     public Head head;
     public Tag stats;
     public Label l;
-    public double sizingBorder = 0;
-    public double increase_amount = 0;
-    public double bg_opaqueness = 0.1;
+    public double sizingBorder;
+    public double increase_amount;
+    public double bg_opaqueness;
     public static HashMap<String, Font> fonts = Utils.loadAllFonts();
     public static Gamemode g = Gamemode.DEFAULT;
-    public static AdvancedImage head_img = Utils.loadImageFromAssets("head/snake_flag_invis"),
-            line_img = Utils.loadImageFromAssets("mid/snake_flag_invis"),
-            corner_img = Utils.loadImageFromAssets("corner/snake_flag_invis"),
-            tail_img = Utils.loadImageFromAssets("tail/snake_flag_invis");
-
 
     public Snakeworld(Gamemode g, Tag stats, AdvancedImage bg_img, double bg_opaqueness) {
         super(g.width, g.height, g.pxsize);
-        Enginegames.Main.enableDebug = false;
+        Enginegames.Main.enableDebug = true;
         Snakeworld.g = g;
         setTps(g.tps);
         setPaintOrder(Label.class, Head.class, Tile.class, Apple.class, Button.class);
@@ -50,8 +45,6 @@ public class Snakeworld extends World {
         wasDead = true;
         removeAll();
         switchWorld(new Deathscreen(stats, head.size-g.start_size, g.name, this));
-        //setBackground(null);
-        //stop();
     }
 
     public void tick() {
@@ -134,14 +127,5 @@ public class Snakeworld extends World {
             }
             return CUSTOM;
         }
-
-        public static Gamemode from(int width, int height, int pxsize, int start_size, double increase_amount, double increase_border) {
-            for (Gamemode g : Gamemode.values) {
-                if (g.width == width && g.height == height && g.pxsize == pxsize && g.start_size == start_size && g.increase_border == increase_border && g.increase_amount == increase_amount)
-                    return g;
-            }
-            return CUSTOM;
-        }
-
     }
 }

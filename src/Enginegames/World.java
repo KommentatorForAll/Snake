@@ -1,15 +1,16 @@
 package Enginegames;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+/**
+ *
+ */
 public abstract class World implements Tickable, KeyListener, MouseListener, WindowListener {
 
     public int pixelSize;
@@ -22,7 +23,6 @@ public abstract class World implements Tickable, KeyListener, MouseListener, Win
     public WorldUI ui;
     public static GameUI mainframe;
     public Random random;
-    public boolean enableDebug = false;
     private int sw, sh;
 
 

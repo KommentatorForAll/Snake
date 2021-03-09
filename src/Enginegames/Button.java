@@ -1,23 +1,87 @@
 package Enginegames;
 
 import java.awt.*;
-import java.util.*;
 
+/**
+ * A basic Button one is able to put into ones world.
+ * When being clicked an event is called.
+ */
 public abstract class Button extends WorldObj {
 
-    public String text;
-    public int width, height, borderWidth;
-    public Color textColor = new Color(0,0,0,255), backgroundColor = new Color(255,255,255,255), backgroundHoverColor = Color.LIGHT_GRAY, borderColor = new Color(0,0,0,255);
-    public Font font;
+    /**
+     * A line of text one is able to display on the button.
+     * Default Value: "" (empty string)
+     */
+    public String text = "";
+
+    /**
+     * the width of the Button in pixel
+     * If you want it to occupy one field of the world use {@link World#pixelSize}
+     * Default Value: 400 px
+     */
+    public int width = 400;
+
+    /**
+     * The height of the Button in pixel
+     * If you want it to occupy one field of the world use {@link World#pixelSize}
+     * Default Value: 100 px
+     */
+    public int height = 100;
+
+    /**
+     * The size of the border around the image.
+     * Default Value: 5 px
+     */
+    public int borderWidth = 5;
+
+    /**
+     * The Color the text has, when drawn onto the button.
+     * Default Value: {@link Color#BLACK}
+     */
+    public Color textColor = Color.BLACK;
+
+    /**
+     * The Background color of the Button.
+     * Default Value: {@link Color#WHITE}
+     */
+    public Color backgroundColor = Color.WHITE;
+
+    /**
+     * The Color the button turns into, while being pressed and not released
+     * Default Value: {@link Color#LIGHT_GRAY}
+     */
+    public Color backgroundHoverColor = Color.LIGHT_GRAY;
+
+    /**
+     * The Border color of the Button.
+     * for the default size, look at {@link Button#borderWidth}
+     * Default Value: {@link Color#BLACK}
+     */
+    public Color borderColor = Color.BLACK;
+
+    /**
+     * The default Font of the Buttons text.
+     * Default Value: SERIF, plain font of size 20 px
+     */
+    public Font font = new Font(Font.SERIF, Font.PLAIN, 20);
+
+    /**
+     * An optional Image, which gets drawn onto the Button.
+     * Default Value: {@link null}
+     */
     public AdvancedImage backgroundImage;
+
+    /**
+     * If one is able to use the button
+     * Default Value: {@link true}
+     */
     public boolean enabled = true;
 
+    /**
+     * Creates a new Button.
+     * This actually does nothing, but redraw itself.
+     */
     public Button() {
-        text = "";
-        width = 400;
-        height = 100;
-        font = new Font(Font.SERIF, Font.PLAIN, 20);
-        borderWidth = 5;
         update();
     }
 
@@ -151,7 +215,7 @@ public abstract class Button extends WorldObj {
     }
 
     /**
-     * ignore it?
+     * An update function one can add code to. Should call {@link Button#update()} though.
      */
     public void _update() {}
 }

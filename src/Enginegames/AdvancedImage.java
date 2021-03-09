@@ -4,9 +4,23 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.*;
 
+/**
+ * An extension of BufferedImages, able to be cloned, having a default positioning when drawn with supporting functions
+ */
 public class AdvancedImage extends BufferedImage implements Cloneable {
 
+    /**
+     * The default position, when being drawn.
+     * @see ImagePosition
+     * Default value: {@link ImagePosition#CENTER}
+     */
     public ImagePosition imgpos = ImagePosition.CENTER;
+
+    /**
+     * The default sizing setting when drawn.
+     * @see ImageSizing
+     * Default value: {@link ImageSizing#NONE}
+     */
     public ImageSizing imgs = ImageSizing.NONE;
 
     /**
@@ -37,17 +51,31 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         drawImage(img);
     }
 
+    /**
+     * draws a string onto the image.
+     * @param s the string to draw
+     * @param color the color to paint the string in
+     * @param font the font of the string
+     * @deprecated
+     * @see AdvancedImage#drawText(Color, Font, String)
+     */
     public void draw(String s, Color color, Font font) {
         drawText(color, font, s);
     }
 
+    /**
+     * draws an Image onto this image.
+     * @param img the image to draw
+     * @deprecated
+     * @see AdvancedImage#drawImage(AdvancedImage)
+     */
     public void draw(AdvancedImage img) {
         drawImage(img);
     }
 
     /**
      * draws a BufferedImage onto this image.
-     * @param img
+     * @param img the image to draw
      */
     public void drawImage(BufferedImage img) {
         drawImage(img, 0,0);
@@ -74,6 +102,13 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         drawImage_(img, x, y, opaque);
     }
 
+    /**
+     * internal function to draw an image
+     * @param image image to draw
+     * @param x position to draw at
+     * @param y position to draw at
+     * @param opaque the opaqueness of the image
+     */
     private void drawImage_(BufferedImage image, int x, int y, float opaque) {
         Graphics2D g2d = createGraphics();
         g2d.setComposite(
@@ -146,13 +181,6 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
      * @return a scaled version of the image
      */
     public AdvancedImage scale(int width, int height) {
-//        if (width != getWidth() || height != getHeight()) {
-//            Graphics2D g = createGraphics();
-//            g.setComposite(AlphaComposite.Src);
-//            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-//            g.drawImage(this, 0, 0, width, height, (ImageObserver)null);
-//            g.dispose();
-//        }
         double hscale = 1.0*height/getHeight(null);
         double wscale = 1.0*width/getWidth(null);
         AdvancedImage after = new AdvancedImage(width, height, getType());
@@ -187,24 +215,41 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
     }
 
     /**
-     *
+     * Enhanced toString function for AdvancedImages.
+     * Calls the toString function of BufferedImages and adds its positioning as well as its sizing to it.
      * @return stringyfied image information
      */
+    @Override
     public String toString() {
         return super.toString() + " sizing: " + imgs + "; Positioning: " + imgpos;
     }
 
+    /**
+     * prints out an rgb-mesh of the Image itself.
+     * Can be quite useful for debugging (especially when looking for the point, where you lost your meta data)
+     */
     public void print(){
+        System.out.println(toARGBMesh());
+    }
+
+    /**
+     * creates a String version of the image, containing its ARGB data as hexcode.
+     * Hexcode is formatted as 0xAARRGGBB
+     * @return a string of the image
+     */
+    public String toARGBMesh() {
         int w = getWidth(), h = getHeight();
-        System.out.println("[");
+        StringBuilder out = new StringBuilder();
+        out.append("[\n");
         for (int i = 0; i<w; i++) {
-            System.out.print("[");
+            out.append("[");
             for (int j = 0; j<h; j++) {
-                System.out.print("["+String.format("%8s",Integer.toHexString(getRGB(i,j))).replace(" ", "0")+"] ");
+                out.append("[").append(String.format("%8s", Integer.toHexString(getRGB(i, j))).replace(" ", "0")).append("] ");
             }
-            System.out.println("]");
+            out.append("]\n");
         }
-        System.out.println("]");
+        out.append("]");
+        return out.toString();
     }
 
     /**
@@ -428,37 +473,106 @@ public class AdvancedImage extends BufferedImage implements Cloneable {
         graphics.dispose();
     }
 
+    /**
+     * draws the text onto the image
+     * @param color color the text is painted in
+     * @param font the font of the text
+     * @param text the text to write
+     */
     public void drawText(Color color, Font font, String text) {
         drawText(color, font, text, getWidth()/2, getHeight()/2);
     }
 
+    /**
+     * fetches the dimension of the image.
+     * @return the images dimension as {width, height}
+     */
     public int[] getDimension() {
         return new int[] {getWidth(), getHeight()};
     }
 
+    /**
+     * Enum for how the Image is positioned, when drawn by a supporting class
+     */
     public enum ImagePosition {
+        /**
+         * the x and y position define the top left corner of the image
+         */
         TOP_LEFT,
+
+        /**
+         * the x and y position define the center of the image
+         */
         CENTER
     }
 
+    /**
+     * an enum for what to do, if the image doesn't fit the bounds of what it is drawn onto
+     */
     public enum ImageSizing {
+
+        /**
+         * leaving the image as it is. It will be untouched.
+         */
         NONE,
+
+        /**
+         * draws the image over and over again, until the bounds are reached
+         */
         TILE,
+
+        /**
+         * Stretches the image until it fits the size.
+         * May (and is intended to) cause distribution
+         */
         STRETCH,
+
+        /**
+         * When the image is too big, it gets cropped until it fits.
+         * I actually have no idea what it does and why one would use it
+         */
         CROP
     }
 
+    /**
+     * Manages the vertical alignment of drawn text
+     */
     enum VerticalAlignment
     {
+        /**
+         * y coordinate is the topmost pixel of the text
+         */
         TOP,
+
+        /**
+         * y coordinate is the center coordinate of the text
+         */
         CENTER,
+
+        /**
+         * y coordinate is the lowest pixel of the text
+         */
         BOTTOM
     }
 
+    /**
+     * Manages the Horizontal alignment of the text.
+     */
     enum HorizontalAlignment
     {
+        /**
+         * x coordinate is the leftmost pixel of the text
+         */
         LEFT,
+
+        /**
+         * x coordinate is in the center of the text
+         */
         CENTER,
+
+        /**
+         * x coordinate is the rightmost pixel of the text
+         */
         RIGHT
     }
 }

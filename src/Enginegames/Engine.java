@@ -6,9 +6,41 @@ import java.util.stream.Collectors;
 
 public class Engine {
 
-    public long ttime, tick, latestMspt;
+    /**
+     * Timestamp of the last executed tick
+     */
+    public long ttime;
+
+    /**
+     * The counter which counts how many ticks have been executed so far.
+     * May wrap when Long.MAX_VALUE is reached and then starts counting from Long.MIN_VALUE again.
+     */
+    public long tick;
+
+    /**
+     * the amount of milliseconds it took to execute the last tick
+     */
+    public long latestMspt;
+
+    /**
+     * The amount of ticks, executed every second, when the engine is running
+     */
     public double tps;
-    public boolean started, terminateOnError;
+
+    /**
+     * if the engine is running
+     */
+    public boolean started;
+
+    /**
+     * if the engine should terminate, when an uncaught exception occurs.
+     * This is false by default. therefore the engine will keep running no matter what.
+     */
+    public boolean terminateOnError;
+
+    /**
+     * list of Objects which are getting called every tick.
+     */
     public Collection<Tickable> tickables;
 
     /**
@@ -139,28 +171,58 @@ public class Engine {
     }
 
 
-
+    /**
+     * Gets generated every tick.
+     * Inside this tick, all objects, present in the engine get a call at their _tick() function.
+     */
     public static class TickEngine extends Thread {
+
+        /**
+         * the calling Engine
+         */
         Engine e;
 
+        /**
+         * creates a new Tick.
+         * @param e the engine which calls this function / whose objects shall be called
+         * @param cnt the hopefully unique identifier of the tick. Usually a counter
+         */
         public TickEngine(Engine e, long cnt) {
             super("Tick-"+cnt);
             this.e = e;
         }
 
+        /**
+         * Overwrites the Thread.run() function. Calls the tick() function of the calling engine
+         */
+        @Override
         public void run() {
             e.tick();
         }
     }
 
+    /**
+     * Class used to start up a new Engine, without having issues of following code of the main class being executed
+     */
     private static class EngineStarter extends Thread {
 
+        /**
+         * the engine to start
+         */
         Engine e;
 
+        /**
+         * Creates a new "ligtning torch" to light up the engine
+         * @param e engine to light up
+         */
         public EngineStarter(Engine e) {
             this.e = e;
         }
 
+        /**
+         * lights up the engine
+         */
+        @Override
         public void run() {
             e.started = true;
             e.loop();
