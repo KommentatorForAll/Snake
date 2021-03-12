@@ -257,6 +257,9 @@ public class Utils {
         try {
             if (Main.enableDebug)
                 System.out.println("Creating path for "+dirPath);
+            if (Files.exists(Paths.get(dirPath))) {
+                return new File(to);
+            }
             Files.createDirectories(Paths.get(dirPath));
             JarEntry je = me.getJarEntry(source);
             if (Main.enableDebug)

@@ -15,21 +15,22 @@ public class Settingsscreen extends World {
 
     public Textfield startsize, width, height, pxsize, tps;
     public ScrollButton primaryColor, secondaryColor, tertiaryColor, gamemode;
-    public Label pcl, scl, tcl, gml, szl, wl, hl, pxl, tpsl, title, ssal, sssl;
+    public Label pcl, gml, szl, wl, hl, pxl, tpsl, title, ssal, sssl;
     public Button start, exit, swp, nRndColors, skinSetApple, skinSetSnake;
     public static boolean skin, usrInputtedColor;
     public List<AdvancedImage> clrs = colorOptions();
     public static Color primary, secondary, tertiary;
-    public int ssai = 1, sssi = 2;
+    public static int ssai = 2, sssi = 3, tick;
 
     public static Map<String, Map<String, AdvancedImage>> sprites = Filework.loadAllSprites();
 
     public Settingsscreen() {
-        super(10,15,64);
+        super(10,12,64);
+        Button.defaultFont = Snakeworld.fonts.get("Welbut").deriveFont(15F);
         AdvancedImage img = new AdvancedImage(64,64);
         img.fill(Color.BLACK);
         setBackground(img);
-        setBackgroundOption(WorldUI.ImageOption.STRETCHED);
+        img.imgs = AdvancedImage.ImageSizing.STRETCH;
         gameSkins();
         gameSettings();
         setTps(20);
@@ -37,7 +38,7 @@ public class Settingsscreen extends World {
 
     @Override
     public void tick() {
-
+        tick = (tick+1)%360+1;
     }
 
     public void gameSettings() {
@@ -149,11 +150,10 @@ public class Settingsscreen extends World {
     public void addCommon() {
         title = new Label("settings") {
             public void tick() {
-                setTextColor(new Color(clrs.get(random.nextInt(clrs.size())).getRGB(0,0)));
+                setTextColor(Color.getHSBColor((float)(tick/360.0),1,1));
             }
         };
         title.setFont(Snakeworld.fonts.get("pixel-bubble").deriveFont(40F));
-        title.setTextColor(new Color(clrs.get(random.nextInt(clrs.size())).getRGB(0,0)));
         title.setBackgroundColor(Color.BLACK);
         title.setBackgroundHoverColor(Color.BLACK);
         addObject(title, 5,1);
@@ -169,7 +169,6 @@ public class Settingsscreen extends World {
                     g = new Snakeworld.Gamemode("custom", Integer.parseInt(s.width.text), Integer.parseInt(s.height.text), Integer.parseInt(s.pxsize.text), Integer.parseInt(s.startsize.text), 0, 0);
                 }
                 try {
-                    World w = new Snakeworld(g, Deathscreen.stats, Utils.loadImageFromAssets("background_tile"), 1);
                     setTps(Integer.parseInt(tps.text));
                     primary = new Color(((AdvancedImage)primaryColor.selected).getRGB(10,10));
                     secondary = new Color(((AdvancedImage)secondaryColor.selected).getRGB(10,10));
@@ -183,6 +182,7 @@ public class Settingsscreen extends World {
                     Tile.tail = Tile.tail.rotate(-90);
                     Apple.skin = (AdvancedImage) sprites.get("apple").values().toArray()[ssai];
                     Head.commonImage = Head.commonImage.rotate(90);
+                    World w = new Snakeworld(g, Deathscreen.stats, Utils.loadImageFromAssets("background_tile"), 1);
                     World.switchWorld(w);
                 }
                 catch(IllegalArgumentException ex) {
@@ -204,7 +204,7 @@ public class Settingsscreen extends World {
         start.setTextColor(Color.WHITE);
         start.setSize(96,32);
         start.setBackgroundColor(Color.BLUE);
-        addObject(start, 3,12);
+        addObject(start, 3,10);
 
         exit = new Button() {
             @Override
@@ -220,7 +220,7 @@ public class Settingsscreen extends World {
         exit.setSize(96,32);
         exit.setText("Exit");
         exit.setBackgroundColor(Color.RED);
-        addObject(exit, 7,12);
+        addObject(exit, 7,10);
 
         swp = new Button() {
             @Override
@@ -441,7 +441,6 @@ public class Settingsscreen extends World {
             img.fill(clr);
             imgs.add(img);
         }
-        imgs.get(5).print();
 
         return imgs;
     }

@@ -28,7 +28,7 @@ public class Deathscreen extends World {
         AdvancedImage img = new AdvancedImage(1000,1000);
         img.fill(Color.BLACK);
         setBackground(img);
-        setBackgroundOption(WorldUI.ImageOption.STRETCHED);
+        img.imgs = AdvancedImage.ImageSizing.STRETCH;
         boolean ishighscore = Filework.checkHighscore(stats, gamename, score);
         String oldHSH = (String) stats.findNextTag(gamename).get("playername");
         Label nhs = new Label("Highscore\n"+ oldHSH + ": "+Filework.getHighscore(stats, gamename));
@@ -53,7 +53,9 @@ public class Deathscreen extends World {
 
             @Override
             public void clickEvent(MouseEventInfo e) {
-                World.switchWorld(((Deathscreen) world).origin);
+                Deathscreen w= (Deathscreen) world;
+                Snakeworld s = (Snakeworld) w.origin;
+                switchWorld(new Snakeworld(Snakeworld.g, s.stats,s.ui.backgroundImage, s.bg_opaqueness));
             }
         };
         b.setText("Retry");

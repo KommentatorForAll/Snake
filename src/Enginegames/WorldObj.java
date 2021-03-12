@@ -1,6 +1,8 @@
 package Enginegames;
 
 import javax.imageio.ImageIO;
+import java.awt.geom.Area;
+import java.awt.image.BufferedImage;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -9,16 +11,39 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * superclass of all objects being able to be added to the world
+ */
 public abstract class WorldObj implements Tickable {
 
+    /**
+     * The position of the object
+     */
     public int x, y;
+
+    /**
+     * The sprite of the Object.
+     * If you want to use Buffered images use the {@link AdvancedImage#AdvancedImage(BufferedImage)} constructor
+     */
     public AdvancedImage img;
+
+    /**
+     * The world the object is in.
+     * May be null, if not present in any world.
+     */
     public World world;
 
+    /**
+     * Creates a new Object with an empty image
+     */
     public WorldObj() {
-        img = Utils.loadImageFromAssets("Invis");
+        this(new AdvancedImage(1,1));
     }
 
+    /**
+     * Creates a new Object with the given Image.
+     * @param img The sprite of the Object
+     */
     public WorldObj(AdvancedImage img) {
         this.img = img;
     }
@@ -85,6 +110,10 @@ public abstract class WorldObj implements Tickable {
         img = new AdvancedImage(ImageIO.read(new File(name)));
     }
 
+    /**
+     * The raw Mouseevent, used to being able to execute stuff, while ensuring it gets called even if the {@link WorldObj#mouseEvent(MouseEventInfo)} function is overwritten
+     * @param e the event caused
+     */
     public void _mouseEvent(MouseEventInfo e) {
         mouseEvent(e);
     }
@@ -146,8 +175,12 @@ public abstract class WorldObj implements Tickable {
     }
 
 
-
-    public final Rectangle getShape() {
+    /**
+     * Returns the hitbox of the Object. Used for collision detection
+     * !!if you use custom shapes, make sure to overwrite the {@link WorldObj#isTouching(WorldObj)} as well
+     * @return the shape of the object
+     */
+    public Shape getShape() {
         int[][] dim = getDimension();
         int[] size = img.getDimension();
         Point offset = world.getOffset();
@@ -195,7 +228,9 @@ public abstract class WorldObj implements Tickable {
      * @return if the two object touch
      */
     public boolean isTouching(WorldObj o) {
-        return getShape().intersects(o.getShape());
+        Area a = new Area(o.getShape());
+        a.intersect(new Area(getShape()));
+        return a.isEmpty();
     }
 
     /**
@@ -204,8 +239,7 @@ public abstract class WorldObj implements Tickable {
      * @return if any is touching
      */
     public <T extends WorldObj> boolean isTouching(Class<T> cls) {
-        Shape s = getShape();
-        return world.objectsOf(cls).stream().map(WorldObj::getShape).anyMatch(s::intersects);
+        return world.objectsOf(cls).stream().anyMatch(this::isTouching);
     }
 
     /**

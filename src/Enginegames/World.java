@@ -9,20 +9,72 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 /**
- *
+ * The world everything takes place in.
+ * Different Elements can be added, moved and others.
+ * It creates events once a key is pressed or an element is clicked on.
  */
 public abstract class World implements Tickable, KeyListener, MouseListener, WindowListener {
 
+    /**
+     * The size of each field.
+     */
     public int pixelSize;
-    public int width, height;
+
+    /**
+     * The amount of fields on the x axis
+     */
+    public int width,
+    /**
+     * The amount of fields on the y axis of the world
+     */
+            height;
+
+    /**
+     * All objects in the world.
+     */
     public Collection<WorldObj> objects;
+
+    /**
+     * A queue of the keys pressed. Gets emptied every tick and issues the according events
+     */
     public Queue<KeyEventInfo> keys = new ConcurrentLinkedQueue<>();
+
+    /**
+     * A queue of the click events. Gets emptied every tick and issues the according events.
+     */
     public Queue<MouseEventInfo> clicks = new ConcurrentLinkedQueue<>();
+
+    /**
+     * The engine the world is running on.
+     * Default amount of ticks per second: 20
+     */
     public static Engine e = new Engine(20);
+
+    /**
+     * If the world border is a hard edge.
+     * Hard edge means, one is unable to go out of bounds, but stays at the border.
+     * Default value: {@link false}
+     */
     public boolean hardEdge;
+
+    /**
+     * The ui of the world. used to draw and Show the world.
+     */
     public WorldUI ui;
+
+    /**
+     * The frame, every world is drawn on.
+     */
     public static GameUI mainframe;
+
+    /**
+     * the random number generator of the world.
+     */
     public Random random;
+
+    /**
+     * just some private stuff for resizing the world
+     */
     private int sw, sh;
 
 
@@ -47,18 +99,9 @@ public abstract class World implements Tickable, KeyListener, MouseListener, Win
         updateSW();
         random = new Random();
         objects = new CopyOnWriteArrayList<>();
-        ui = new WorldUI(pixelSize*width, pixelSize*height, WorldUI.ImageOption.NONE, pixelSize, this);
+        ui = new WorldUI(pixelSize*width, pixelSize*height, pixelSize, this);
         start();
     }
-
-    /**
-     * sets the image option of the background
-     * @param io the option which gets selected
-     */
-    public final void setBackgroundOption(WorldUI.ImageOption io) {
-        ui.bgOption = io;
-    }
-
 
     /**
      * resizes the world
@@ -85,6 +128,10 @@ public abstract class World implements Tickable, KeyListener, MouseListener, Win
         updateSize();
     }
 
+    /**
+     * Resizes the world by the given amount.
+     * @param amount the amount to resize the world by
+     */
     public final void resizeField(double amount) {
         width *= amount;
         height *= amount;
@@ -103,6 +150,9 @@ public abstract class World implements Tickable, KeyListener, MouseListener, Win
         ui.repaint();
     }
 
+    /**
+     * used for resizing the world.
+     */
     private void updateSW() {
         sw = width*pixelSize;
         sh = height*pixelSize;
@@ -205,6 +255,10 @@ public abstract class World implements Tickable, KeyListener, MouseListener, Win
         return olds;
     }
 
+    /**
+     * switches the focus of the ui to the new world.
+     * @param world the new world to select
+     */
     public static void switchFocus(World world) {
         mainframe.switchWorld(world);
     }
@@ -264,21 +318,36 @@ public abstract class World implements Tickable, KeyListener, MouseListener, Win
     }
 
 
+    /**
+     * The event called by the JFrame. adds a new Keyevent to the queue
+     * @param e the event created
+     */
     @Override
     public final void keyTyped(KeyEvent e) {
         keys.add(new KeyEventInfo(e, 0));
     }
 
+    /**
+     * The event called by the JFrame. adds a new Keyevent to the queue
+     * @param e the event created
+     */
     @Override
     public final void keyPressed(KeyEvent e) {
         keys.add(new KeyEventInfo(e, 1));
     }
 
+    /**
+     * The event called by the JFrame. adds a new Keyevent to the queue
+     * @param e the event created
+     */
     @Override
     public final void keyReleased(KeyEvent e) {
         keys.add(new KeyEventInfo(e, 2));
     }
 
+    /**
+     * handles all key events and issues the events in the sub classes.
+     */
     public final void handleKeys() {
         KeyEventInfo e;
         while ((e = keys.poll()) != null)
@@ -339,6 +408,10 @@ public abstract class World implements Tickable, KeyListener, MouseListener, Win
      */
     public void keyReleased(int key){}
 
+    /**
+     * Called by the JFrame, when an mouseevent occures. adds it to the queue
+     * @param e the created event
+     */
     public final void mousePressed(MouseEvent e) {
         clicks.add(new MouseEventInfo(e, MouseEventInfo.MOUSE_PRESSED));
     }
@@ -346,6 +419,10 @@ public abstract class World implements Tickable, KeyListener, MouseListener, Win
     public void mousePressed(MouseEvent e, WorldObj obj) {}
 
 
+    /**
+     * Called by the JFrame, when an mouseevent occures. adds it to the queue
+     * @param e the created event
+     */
     public final void mouseClicked(MouseEvent e) {
         clicks.add(new MouseEventInfo(e, MouseEventInfo.MOUSE_CLICKED));
     }
@@ -353,36 +430,47 @@ public abstract class World implements Tickable, KeyListener, MouseListener, Win
     public void mouseClicked(MouseEvent e, WorldObj obj) {}
 
 
+    /**
+     * Called by the JFrame, when an mouseevent occures. adds it to the queue
+     * @param e the created event
+     */
     public final void mouseReleased(MouseEvent e) {
         clicks.add(new MouseEventInfo(e, MouseEventInfo.MOUSE_RELEASED));
     }
 
     public void mouseReleased(MouseEvent e, WorldObj obj) {}
 
+    /**
+     * Called by the JFrame, when an mouseevent occures. adds it to the queue
+     * @param e the created event
+     */
     public final void mouseEntered(MouseEvent e) {
         clicks.add(new MouseEventInfo(e, MouseEventInfo.MOUSE_ENTERED));
     }
 
     public void mouseEntered(MouseEvent e, WorldObj obj) {}
 
+    /**
+     * Called by the JFrame, when an mouseevent occures. adds it to the queue
+     * @param e the created event
+     */
     public final void mouseExited(MouseEvent e) {
         clicks.add(new MouseEventInfo(e,MouseEventInfo.MOUSE_EXITED));
     }
 
     public void mouseExited(MouseEvent e, WorldObj obj) {}
 
+    /**
+     * Handles all Mouse events.
+     * Issues the events of the world as well as the clicked objects.
+     */
     public void handleMouse() {
         MouseEventInfo e;
-        Point p, uiLocation = ui.getLocation();
-        //int[] aabsPos, relativePos;
         WorldObj o;
         List<WorldObj> objs;
-        while ((e = clicks.poll()) != null)
-        {
-            p = e.e.getPoint();
-            int[] absPos = new int[] {p.x-uiLocation.x, p.y - uiLocation.y};
-            int[] relativePos = new int[] {absPos[0]/pixelSize, absPos[1]/pixelSize};
-            objs = objects.stream().filter(ob -> ob.isAt(absPos[0], absPos[1], true)).collect(Collectors.toList());
+        while ((e = clicks.poll()) != null) {
+            Point p = e.e.getPoint();
+            objs = objects.stream().filter(ob -> ob.isAt(p.x-mainframe.bardim[0], p.y-mainframe.bardim[1], true)).collect(Collectors.toList());
             o = objs.isEmpty()? null : objs.get(0);
             MouseEventInfo finalE = e;
             switch (e.type) {
@@ -421,19 +509,9 @@ public abstract class World implements Tickable, KeyListener, MouseListener, Win
      */
     public final Point getOffset() {
         Point p = ui.getLocation();
-        int[] bardim = mainframe.bardim;
-        p.x += bardim[0]+(pixelSize/2);
-        p.y += bardim[1]+(pixelSize/2);
+        p.x += (pixelSize/2);
+        p.y += (pixelSize/2);
         return p;
-    }
-
-    private static class KeyEventInfo {
-        public int type;
-        public KeyEvent e;
-        public KeyEventInfo(KeyEvent e, int type) {
-            this.e = e;
-            this.type = type;
-        }
     }
 
     /**
@@ -478,4 +556,13 @@ public abstract class World implements Tickable, KeyListener, MouseListener, Win
      * called as a WindowListener, can be implemented for initial or final actions
      */
     public void windowDeactivated(WindowEvent e) {}
+
+    private static class KeyEventInfo {
+        public int type;
+        public KeyEvent e;
+        public KeyEventInfo(KeyEvent e, int type) {
+            this.e = e;
+            this.type = type;
+        }
+    }
 }

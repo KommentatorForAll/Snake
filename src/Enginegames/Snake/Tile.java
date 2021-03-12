@@ -26,6 +26,7 @@ public class Tile extends WorldObj {
         this.dir = dir;
         this.age = age;
         selectImage();
+        if (img != null)
         img.imgs = AdvancedImage.ImageSizing.STRETCH;
         //setImage(Util.loadImageFromAssets("python"));
     }
@@ -33,7 +34,7 @@ public class Tile extends WorldObj {
     private void selectImage() {
         int back = dir/4;
         int front = dir%4;
-        int workdir = back;
+        int workdir;
         AdvancedImage selected = line;
         if (back%2!=front%2) {
             selected = corner;

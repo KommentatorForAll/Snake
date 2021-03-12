@@ -11,23 +11,51 @@ import java.util.List;
 
 public class WorldUI extends JPanel {
 
-    public BufferedImage backgroundImage;
-    public ImageOption bgOption;
+    /**
+     * The background image of the world.
+     */
+    public AdvancedImage backgroundImage;
 
+    /**
+     * the list of objects to draw onto the screen
+     */
     public List<WorldObj> objs;
+
+    /**
+     * The order in which objects are on top and which are at the bottom.
+     */
     public List<Class<? extends WorldObj>> paintOrder;
+
+    /**
+     * The fieldsize
+     */
     public int pxsize;
+
+    /**
+     * The opaqueness of the background
+     */
     public double bg_opaque=1;
 
+    /**
+     * Creates a new UI with the given height and width
+     * @param width width of the ui
+     * @param height height of the ui
+     */
     public WorldUI(int width, int height) {
-        this(width, height, ImageOption.NONE,1, null);
+        this(width, height,1, null);
     }
 
-    public WorldUI(int width, int height, ImageOption bgOption, int pxsize, KeyListener kl) {
+    /**
+     * Creates a new UI
+     * @param width amount of fields on the x axis
+     * @param height amount of fields on the y axis
+     * @param pxsize size of the fields in px
+     * @param kl the keylistener
+     */
+    public WorldUI(int width, int height, int pxsize, KeyListener kl) {
         super();
         objs = new ArrayList<>();
         paintOrder = new ArrayList<>();
-        this.bgOption = bgOption;
         setSize(width, height);
         setPreferredSize(getSize());
         //setMaximumSize();
@@ -41,7 +69,7 @@ public class WorldUI extends JPanel {
      * !!may cause graphical bugs, when image is null or trans parent!!
      * @param img the new background image
      */
-    public void setBackground(BufferedImage img) {
+    public void setBackground(AdvancedImage img) {
         backgroundImage = img;
         repaint();
     }
@@ -56,12 +84,16 @@ public class WorldUI extends JPanel {
         repaint();
     }
 
+    /**
+     * paints all objects onto the screen
+     * @param g the graphics element of the screen
+     */
     public void paintComponent(Graphics g) {
         if (backgroundImage != null) {
             ((Graphics2D) g).setComposite(
                     AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float) bg_opaque));
-            switch (bgOption) {
-                case TILED:
+            switch (backgroundImage.imgs) {
+                case TILE:
                     AdvancedImage tmp = (new AdvancedImage(backgroundImage)).scale(pxsize, pxsize);
                     for (int x = 0; x < getWidth(); x += pxsize) {
                         for (int y = 0; y < getHeight(); y += pxsize) {
@@ -70,7 +102,7 @@ public class WorldUI extends JPanel {
                     }
                     break;
 
-                case STRETCHED:
+                case STRETCH:
                     int hscale = getHeight() / backgroundImage.getHeight(null);
                     int wscale = getWidth() / backgroundImage.getWidth(null);
                     AdvancedImage after = new AdvancedImage(getWidth(), getHeight(), backgroundImage.getType());
@@ -158,13 +190,13 @@ public class WorldUI extends JPanel {
         paintOrder = Arrays.asList(classes);
     }
 
+    /**
+     * Sets the background opaquness to the given value.
+     * @param opaque opaqueness to set to
+     * @throws IllegalArgumentException when the opaquness is not between 0 and 1
+     */
     public void setBackgroundOpaqueness(double opaque) {
+        if (0>opaque || 1<opaque) throw new IllegalArgumentException("Opaquness must be between 0 and 1");
         bg_opaque = opaque;
-    }
-
-    public enum ImageOption {
-        STRETCHED,
-        TILED,
-        NONE
     }
 }

@@ -60,10 +60,16 @@ public abstract class Button extends WorldObj {
     public Color borderColor = Color.BLACK;
 
     /**
+     * The custom font for each button.
+     * If none is present (font == null) the {@link Button#defaultFont} is used instead
+     */
+    public Font font;
+
+    /**
      * The default Font of the Buttons text.
      * Default Value: SERIF, plain font of size 20 px
      */
-    public Font font = new Font(Font.SERIF, Font.PLAIN, 20);
+    public static Font defaultFont = new Font(Font.SERIF, Font.PLAIN, 20);
 
     /**
      * An optional Image, which gets drawn onto the Button.
@@ -82,6 +88,7 @@ public abstract class Button extends WorldObj {
      * This actually does nothing, but redraw itself.
      */
     public Button() {
+        super(null);
         update();
     }
 
@@ -93,7 +100,7 @@ public abstract class Button extends WorldObj {
         img.fill(borderColor);
         img.drawRect(borderWidth, borderWidth, width-(borderWidth*2), height-(borderWidth*2), backgroundColor);
         if (backgroundImage != null) img.drawImage(backgroundImage);
-        if (!text.isEmpty()) img.drawText(textColor, font, text);
+        if (!text.isEmpty()) img.drawText(textColor, font==null?defaultFont:font, text);
         setImage(img);
     }
 

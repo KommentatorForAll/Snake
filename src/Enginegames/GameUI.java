@@ -121,11 +121,15 @@ public class GameUI extends JFrame {
             y += 200;
         }
         Dimension d = new Dimension(x+bardim[0], y+bardim[1]);
+        int w = getWidth(), h = getHeight();
+        d = new Dimension(Math.max(d.width, w), Math.max(d.height, h));
         if (Main.enableDebug)
             System.out.println("new Frame dimensions: "+d);
         setMinimumSize(d);
         setSize(d);
-        worldUI.setLocation(x/2-worldUI.getWidth()/2-bardim[0], y/2-worldUI.getHeight()/2-bardim[1]);
+        repaint();
+        worldUI.setLocation(d.width/2-worldUI.getWidth()/2-bardim[0]/2, d.height/2-worldUI.getHeight()/2-bardim[1]/2);
+        System.out.println(worldUI.getLocation());
         add(worldUI);
 
 

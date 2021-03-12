@@ -23,11 +23,10 @@ public class Snakeworld extends World {
 
     public Snakeworld(Gamemode g, Tag stats, AdvancedImage bg_img, double bg_opaqueness) {
         super(g.width, g.height, g.pxsize);
-        Enginegames.Main.enableDebug = true;
+        Enginegames.Main.enableDebug = false;
         Snakeworld.g = g;
         setTps(g.tps);
         setPaintOrder(Label.class, Head.class, Tile.class, Apple.class, Button.class);
-        setBackgroundOption(WorldUI.ImageOption.TILED);
         this.bg_opaqueness = bg_opaqueness;
         this.stats = stats;
         sizingBorder = g.increase_border;
@@ -35,8 +34,11 @@ public class Snakeworld extends World {
         stats.print();
         setBackgroundOpaqueness(bg_opaqueness);
         setBackground(bg_img);
-        setBackgroundOption(WorldUI.ImageOption.TILED);
-
+        bg_img.imgs = AdvancedImage.ImageSizing.TILE;
+        pause();
+        head = new Head(this, width/2,height/2);
+        head.size = g.start_size;
+        head.setImage(head.img.rotate(180));
     }
 
     public void showDeathscreen() {
@@ -52,12 +54,15 @@ public class Snakeworld extends World {
     }
 
     public void begin() {
-        head = new Head(this, width/2,height/2);
-        head.size = g.start_size;
-        resume();
+        pause();
     }
 
     public void resume() {
+        if (head == null) {
+            head = new Head(this, width/2,height/2);
+            head.size = g.start_size;
+            head.setImage(head.img.rotate(180));
+        }
         running = true;
         removeObjects(Label.class);
         System.out.println(l);
@@ -65,11 +70,11 @@ public class Snakeworld extends World {
 
     public void pause() {
         running = false;
-        l = new Label("PAUSED");
+        l = new Label("press space to start");
         l.setTextColor(Color.WHITE);
         l.setBackgroundColor(Color.BLACK);
-        l.setFont(fonts.get("pixel-bubble").deriveFont(30F));
-        addObject(l, width/2, height/2);
+        l.setFont(fonts.get("pixel-bubble").deriveFont(20F));
+        addObject(l, width/2, height/4);
     }
 
     public void keyPressed(int key) {
@@ -88,7 +93,7 @@ public class Snakeworld extends World {
         if (key == 27) { //escape
             pause();
         }
-        if (head != null) head.keyPressed(key);
+        if (head != null && running) head.keyPressed(key);
     }
 
     public void windowClosed(WindowEvent e) {
