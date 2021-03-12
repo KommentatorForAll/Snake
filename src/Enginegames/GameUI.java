@@ -138,7 +138,7 @@ public class GameUI extends JFrame {
             public void componentResized(ComponentEvent evt) {
                 int x = getWidth(), y = getHeight();
                 worldUI.setLocation(x/2-worldUI.getWidth()/2-(bardim[0]/2), y/2-worldUI.getHeight()/2-(bardim[1]/2));
-                setLocation(mpos[0]-worldUI.getWidth()/2,mpos[1]-worldUI.getHeight()/2);
+                //setLocation(mpos[0]-worldUI.getWidth()/2,mpos[1]-worldUI.getHeight()/2);
             }
         });
 

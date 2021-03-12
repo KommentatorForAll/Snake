@@ -15,7 +15,7 @@ public class Settingsscreen extends World {
 
     public Textfield startsize, width, height, pxsize, tps;
     public ScrollButton primaryColor, secondaryColor, tertiaryColor, gamemode;
-    public Label pcl, gml, szl, wl, hl, pxl, tpsl, title, ssal, sssl;
+    public Label pcl, gml, szl, wl, hl, pxl, tpsl, title, ssal, sssl, info;
     public Button start, exit, swp, nRndColors, skinSetApple, skinSetSnake;
     public static boolean skin, usrInputtedColor;
     public List<AdvancedImage> clrs = colorOptions();
@@ -34,6 +34,7 @@ public class Settingsscreen extends World {
         gameSkins();
         gameSettings();
         setTps(20);
+        objectsOf(Button.class).forEach(Button::update);
     }
 
     @Override
@@ -244,6 +245,8 @@ public class Settingsscreen extends World {
         swp.setBackgroundColor(Color.ORANGE);
         swp.setTextColor(Color.BLACK);
         addObject(swp, 8,0);
+
+        info = new Label("use left and right-click to change gamemodes.\n");
     }
 
     public void gameSkins() {

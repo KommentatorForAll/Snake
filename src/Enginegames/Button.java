@@ -97,7 +97,7 @@ public abstract class Button extends WorldObj {
      */
     public final void update() {
         AdvancedImage img = new AdvancedImage(width, height);
-        img.fill(borderColor);
+        img.fill(enabled?borderColor:Color.RED);
         img.drawRect(borderWidth, borderWidth, width-(borderWidth*2), height-(borderWidth*2), backgroundColor);
         if (backgroundImage != null) img.drawImage(backgroundImage);
         if (!text.isEmpty()) img.drawText(textColor, font==null?defaultFont:font, text);
